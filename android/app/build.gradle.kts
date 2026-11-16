@@ -402,6 +402,9 @@ android {
 
   packaging {
     jniLibs {
+      // Sideloaded APKs are downloaded directly from GitHub. Compress native
+      // libraries to reduce that transfer; Android extracts them at install.
+      useLegacyPackaging = true
       // pickFirst only suppresses the duplicate libc++ merge error; the
       // sourceSets rule below makes the runtime the mpv-android AAR carries
       // (the one libmpv was linked against) win for std::from_chars<float>,

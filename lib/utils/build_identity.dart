@@ -1,7 +1,7 @@
-/// Public fork identity. Release builds set VEXILYZE_BUILD so upstream tests
-/// and other platform build configurations keep their existing contracts.
+/// Independent TV build configuration. The owner keeps the Plezy display name
+/// for personal installations; update and service identities remain separate.
 const isVexilyzeBuild = bool.fromEnvironment('VEXILYZE_BUILD');
-const appDisplayName = isVexilyzeBuild ? 'Vexilyze TV' : 'Plezy';
+const appDisplayName = 'Plezy';
 const appLinkScheme = isVexilyzeBuild ? 'vexilyzetv' : 'plezy';
 
 /// The upstream project's OAuth registrations and hosted services belong to

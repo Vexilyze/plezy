@@ -1,8 +1,9 @@
-# Vexilyze TV Android releases
+# Personal Plezy Android TV builds
 
-Vexilyze TV is an independently maintained fork of Plezy. Its Android application ID is
-`com.vexilyze.tv`. Kotlin namespaces stay unchanged so upstream changes remain easy to merge.
-Release APKs install alongside Plezy and do not replace or inherit its application data.
+This independently modified TV build displays **Plezy** for the owner's personal installations.
+Its Android application ID remains `com.vexilyze.tv`, and it keeps the build 161 signing key.
+Kotlin namespaces stay unchanged so upstream changes remain easy to merge. These APKs update
+previous fork installs in place, but do not replace or inherit the original upstream app's data.
 
 ## Build and signing inputs
 
@@ -48,11 +49,22 @@ Set `ANDROID_HOME` and put the pinned Flutter SDK on `PATH`, then run:
 bash scripts/fork/build_android.sh
 ```
 
-The script enables the fork's branding and checks for updates from `Vexilyze/plezy`. It produces
-`build/fork-release/vexilyze-tv-android.apk`, an APK SHA-256 file, the public signing certificate
-fingerprint, source attribution, license and release notes. It verifies the signature against
-the committed fingerprint, package ID, display name, version, non-debuggable flag and all three
-supported architectures (ARMv7, ARM64 and x86_64). Release builds cannot fall back to debug signing.
+The script checks for updates from `Vexilyze/plezy` and produces three standalone APKs in
+`build/fork-release/`: `plezy-android-arm64-v8a.apk`, `plezy-android-armeabi-v7a.apk`, and
+`plezy-android-x86_64.apk`, each with its own SHA-256 file. The output also contains the public
+signing certificate fingerprint, source attribution, license and release notes. Packaging verifies
+each APK's signature against the committed fingerprint, package ID, display name, version,
+non-debuggable flag, compressed native libraries and exact single architecture. Release builds
+cannot fall back to debug signing.
+
+Flutter normally adds an architecture offset to split APK version codes. This project sets
+`force-version-code-ignoring-abi=true` so every APK uses the exact numeric build from
+`pubspec.yaml`. Preserve this setting: the updater and Android's installer both rely on monotonic
+version codes, including upgrades from the universal build 161.
+
+`android.packaging.jniLibs.useLegacyPackaging=true` compresses native libraries in each APK.
+Android extracts them at installation, so the smaller download is not the installed app's size.
+The ABI split also avoids storing unused architectures on the device.
 
 Builds use pinned source and dependency inputs; byte-for-byte reproducibility across hosts is
 not promised. Keep the published APK and its checksum as the exact release artifact.
@@ -67,12 +79,12 @@ not promised. Keep the published APK and its checksum as the exact release artif
 4. Tag that exact commit with `v` followed by the complete pubspec version, including `+build`:
 
 ```bash
-git tag -a 'v2.26.1+161' -m 'Vexilyze TV 2.26.1+161'
-git push origin 'v2.26.1+161'
+git tag -a 'v2.26.1+162' -m 'Plezy TV build 2.26.1+162'
+git push origin 'v2.26.1+162'
 ```
 
-The **Vexilyze TV Android release** workflow runs only in `Vexilyze/plezy`. It analyzes the
-project, runs focused playback/update tests, builds and verifies the signed universal APK, and
+The **Plezy Android release** workflow runs only in `Vexilyze/plezy`. It analyzes the
+project, runs focused playback/update tests, builds and verifies the three signed architecture-specific APKs, and
 publishes a GitHub Release. Upstream's desktop build workflow is not triggered. A missing secret,
 mismatched signer or existing release causes failure instead of publishing another kind of APK.
 
@@ -106,9 +118,11 @@ only after a new signed APK is released and installed.
 
 ## Distribution identity
 
-Retain the upstream `LICENSE` and attribution. Public releases use the Vexilyze TV name,
-`com.vexilyze.tv` application ID, their own icons and `vexilyzetv://` URL scheme as required by
-`TRADEMARKS.md`. Upstream-operated services and third-party app registrations must remain
-disabled for the fork unless replaced with registrations/services controlled by the fork owner.
-Do not enable upstream telemetry or donations in the fork build. The GitHub release's source
-archive and `SOURCE.txt` identify the corresponding source commit and build instructions.
+Retain the upstream `LICENSE` and attribution. The owner requested the original Plezy display
+name and icon for personal TV installations; the fork package ID, update repository, signing key
+and URL scheme remain independent. This is not an official Plezy build. Consult `TRADEMARKS.md`
+for the upstream project's naming and redistribution terms before distribution beyond personal use.
+
+Upstream-operated services and third-party app registrations remain disabled unless replaced
+with services/registrations controlled by the fork owner. Do not enable upstream telemetry or
+donations. The release source archive and `SOURCE.txt` identify corresponding source and build instructions.

@@ -1,5 +1,5 @@
-name: Vexilyze TV Android release
-run-name: Vexilyze TV Android · ${{ github.ref_name }}
+name: Plezy Android release
+run-name: Plezy Android · ${{ github.ref_name }}
 
 on:
   push:
@@ -117,7 +117,7 @@ jobs:
             test/services/playback_source_resolver_test.dart \
             test/services/playback_initialization_offline_cache_test.dart
 
-      - name: Build and verify signed universal APK
+      - name: Build and verify signed APKs for each processor
         shell: bash
         run: bash scripts/fork/build_android.sh
 
@@ -145,7 +145,7 @@ jobs:
       - name: Upload signed release artifacts
         uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7
         with:
-          name: vexilyze-tv-android
+          name: plezy-android
           path: build/fork-release/
           if-no-files-found: error
           retention-days: 30
@@ -160,7 +160,7 @@ jobs:
       - name: Download verified APK and metadata
         uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8
         with:
-          name: vexilyze-tv-android
+          name: plezy-android
           path: release
 
       - name: Publish versioned release
@@ -172,10 +172,10 @@ jobs:
         run: |
           set -euo pipefail
           cd release
-          sha256sum --check vexilyze-tv-android.apk.sha256
+          sha256sum --check plezy-android-*.apk.sha256
           gh release create "$RELEASE_TAG" \
             --verify-tag \
-            --title "Vexilyze TV $RELEASE_TAG" \
+            --title "Plezy $RELEASE_TAG" \
             --notes-file RELEASE_NOTES.md \
-            vexilyze-tv-android.apk vexilyze-tv-android.apk.sha256 \
+            plezy-android-*.apk plezy-android-*.apk.sha256 \
             release-signing-certificate.sha256 SOURCE.txt LICENSE

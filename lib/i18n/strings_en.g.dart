@@ -6150,17 +6150,17 @@ class Translations$tvSleep$en {
 	/// en: 'Sleep permission is enabled'
 	String get permissionReady => 'Sleep permission is enabled';
 
-	/// en: 'Enable Vexilyze TV sleep timer in Android accessibility settings'
-	String get permissionRequired => 'Enable Vexilyze TV sleep timer in Android accessibility settings';
+	/// en: 'Enable Plezy sleep timer in Android accessibility settings'
+	String get permissionRequired => 'Enable Plezy sleep timer in Android accessibility settings';
 
 	/// en: 'Device sleep needs Android TV 9 or later'
 	String get unsupported => 'Device sleep needs Android TV 9 or later';
 
-	/// en: 'Enable the Vexilyze TV sleep timer service, then return here. It uses Android’s screen-lock action and does not read screen content or monitor your actions. If Android blocks a sideloaded service, allow restricted settings for Vexilyze TV in the device’s app settings first.'
-	String get setupHint => 'Enable the Vexilyze TV sleep timer service, then return here. It uses Android’s screen-lock action and does not read screen content or monitor your actions. If Android blocks a sideloaded service, allow restricted settings for Vexilyze TV in the device’s app settings first.';
+	/// en: 'Enable the Plezy sleep timer service, then return here. It uses Android’s screen-lock action and does not read screen content or monitor your actions. If Android blocks a sideloaded service, allow restricted settings for Plezy in the device’s app settings first.'
+	String get setupHint => 'Enable the Plezy sleep timer service, then return here. It uses Android’s screen-lock action and does not read screen content or monitor your actions. If Android blocks a sideloaded service, allow restricted settings for Plezy in the device’s app settings first.';
 
-	/// en: 'Playback paused. Enable Vexilyze TV sleep timer in Android accessibility settings to put the device to sleep.'
-	String get permissionLost => 'Playback paused. Enable Vexilyze TV sleep timer in Android accessibility settings to put the device to sleep.';
+	/// en: 'Playback paused. Enable Plezy sleep timer in Android accessibility settings to put the device to sleep.'
+	String get permissionLost => 'Playback paused. Enable Plezy sleep timer in Android accessibility settings to put the device to sleep.';
 
 	/// en: 'Playback paused, but Android could not put the device to sleep.'
 	String get sleepFailed => 'Playback paused, but Android could not put the device to sleep.';
@@ -10561,10 +10561,10 @@ extension on Translations {
 			'tvSleep.openSettings' => 'Open accessibility settings',
 			'tvSleep.checkingPermission' => 'Checking sleep permission…',
 			'tvSleep.permissionReady' => 'Sleep permission is enabled',
-			'tvSleep.permissionRequired' => 'Enable Vexilyze TV sleep timer in Android accessibility settings',
+			'tvSleep.permissionRequired' => 'Enable Plezy sleep timer in Android accessibility settings',
 			'tvSleep.unsupported' => 'Device sleep needs Android TV 9 or later',
-			'tvSleep.setupHint' => 'Enable the Vexilyze TV sleep timer service, then return here. It uses Android’s screen-lock action and does not read screen content or monitor your actions. If Android blocks a sideloaded service, allow restricted settings for Vexilyze TV in the device’s app settings first.',
-			'tvSleep.permissionLost' => 'Playback paused. Enable Vexilyze TV sleep timer in Android accessibility settings to put the device to sleep.',
+			'tvSleep.setupHint' => 'Enable the Plezy sleep timer service, then return here. It uses Android’s screen-lock action and does not read screen content or monitor your actions. If Android blocks a sideloaded service, allow restricted settings for Plezy in the device’s app settings first.',
+			'tvSleep.permissionLost' => 'Playback paused. Enable Plezy sleep timer in Android accessibility settings to put the device to sleep.',
 			'tvSleep.sleepFailed' => 'Playback paused, but Android could not put the device to sleep.',
 			'tvSleep.settingsFailed' => 'Could not open Android accessibility settings. Open them from your device settings.',
 			'androidUpdater.downloadAndInstall' => 'Download and install',

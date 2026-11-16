@@ -2560,10 +2560,10 @@
     "openSettings": "Open accessibility settings",
     "checkingPermission": "Checking sleep permission…",
     "permissionReady": "Sleep permission is enabled",
-    "permissionRequired": "Enable Vexilyze TV sleep timer in Android accessibility settings",
+    "permissionRequired": "Enable Plezy sleep timer in Android accessibility settings",
     "unsupported": "Device sleep needs Android TV 9 or later",
-    "setupHint": "Enable the Vexilyze TV sleep timer service, then return here. It uses Android’s screen-lock action and does not read screen content or monitor your actions. If Android blocks a sideloaded service, allow restricted settings for Vexilyze TV in the device’s app settings first.",
-    "permissionLost": "Playback paused. Enable Vexilyze TV sleep timer in Android accessibility settings to put the device to sleep.",
+    "setupHint": "Enable the Plezy sleep timer service, then return here. It uses Android’s screen-lock action and does not read screen content or monitor your actions. If Android blocks a sideloaded service, allow restricted settings for Plezy in the device’s app settings first.",
+    "permissionLost": "Playback paused. Enable Plezy sleep timer in Android accessibility settings to put the device to sleep.",
     "sleepFailed": "Playback paused, but Android could not put the device to sleep.",
     "settingsFailed": "Could not open Android accessibility settings. Open them from your device settings."
   },

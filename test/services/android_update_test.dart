@@ -104,6 +104,76 @@ void main() {
       );
     });
 
+    group('Plezy build 162 per-ABI releases', () {
+      const splitTag = 'v2.26.1+162';
+      final releases = [
+        release(splitTag, '2026-11-19', [
+          asset('plezy-android-x86_64.apk', tag: splitTag),
+          asset('plezy-android-armeabi-v7a.apk', tag: splitTag),
+          asset('plezy-android-arm64-v8a.apk', tag: splitTag),
+        ]),
+        release('v2.26.1+161', '2026-11-18', [asset('vexilyze-tv-android.apk', tag: 'v2.26.1+161')]),
+      ];
+      const televisions = [
+        (name: 'ARM64 TV with ARMv7 support', abis: ['arm64-v8a', 'armeabi-v7a'], apk: 'plezy-android-arm64-v8a.apk'),
+        (name: 'ARMv7 TV', abis: ['armeabi-v7a'], apk: 'plezy-android-armeabi-v7a.apk'),
+      ];
+
+      for (final television in televisions) {
+        test('${television.name} upgrades the legacy universal build 161 to its matching APK', () {
+          final update = AndroidUpdateRelease.newestCompatible(
+            releases,
+            repository: repository,
+            supportedAbis: television.abis,
+            installedVersion: '2.26.1',
+            installedBuild: 161,
+          );
+          expect(update, isNotNull);
+          expect(update!.versionLabel, '2.26.1+162');
+          expect(
+            update.version.build,
+            162,
+            reason: 'All ABI APKs use the same upgrade versionCode without ABI offsets',
+          );
+          expect(update.assetName, television.apk);
+          expect(
+            update.downloadUrl.toString(),
+            'https://github.com/$repository/releases/download/$splitTag/${television.apk}',
+          );
+        });
+
+        test('${television.name} already on build 162 is not offered another ABI or the old universal APK', () {
+          expect(
+            AndroidUpdateRelease.newestCompatible(
+              releases,
+              repository: repository,
+              supportedAbis: television.abis,
+              installedVersion: '2.26.1',
+              installedBuild: 162,
+            ),
+            isNull,
+          );
+        });
+      }
+
+      test('an ARMv7 TV is not offered ARM64 or x86_64 when its APK is missing', () {
+        final update = AndroidUpdateRelease.newestCompatible(
+          [
+            release(splitTag, '2026-11-19', [
+              asset('plezy-android-arm64-v8a.apk', tag: splitTag),
+              asset('plezy-android-x86_64.apk', tag: splitTag),
+            ]),
+            releases.last,
+          ],
+          repository: repository,
+          supportedAbis: ['armeabi-v7a'],
+          installedVersion: '2.26.1',
+          installedBuild: 161,
+        );
+        expect(update, isNull);
+      });
+    });
+
     test('a recently published backport cannot hide a higher upgrade version', () {
       final found = AndroidUpdateRelease.newestCompatible(
         [

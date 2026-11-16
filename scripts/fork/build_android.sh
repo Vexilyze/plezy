@@ -16,7 +16,7 @@ if sdk.get("frameworkVersion") != "3.47.1" or sdk.get("frameworkRevision") != "6
 '
 
 flutter pub get --enforce-lockfile --no-example
-flutter build apk --release \
+flutter build apk --release --split-per-abi \
   --dart-define=ENABLE_UPDATE_CHECK=true \
   --dart-define=UPDATE_REPOSITORY=Vexilyze/plezy \
   --dart-define=VEXILYZE_BUILD=true \

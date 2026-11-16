@@ -1,10 +1,12 @@
-# Vexilyze TV
+# Personal Android TV build of Plezy
 
-An independent Android/Android TV fork of [Plezy](https://github.com/edde746/plezy) with an accessibility-based TV sleep timer and in-app APK updates from this repository.
+An independently modified build for the owner's Android TVs, with an accessibility-based sleep timer and in-app APK updates from this repository. The app displays **Plezy** and uses the original icon. This is not an official Plezy release.
 
-**[Download the signed Android APK](https://github.com/Vexilyze/plezy/releases/latest/download/vexilyze-tv-android.apk)** · [Setup and release notes](docs/fork/RELEASE_NOTES.md) · [Building, signing and syncing upstream](docs/fork/RELEASING.md)
+**[Android downloads](https://github.com/Vexilyze/plezy/releases/latest)** · [Setup and release notes](docs/fork/RELEASE_NOTES.md) · [Building, signing and syncing upstream](docs/fork/RELEASING.md)
 
-The custom app lives on `vexilyze/android-tv`; `main` stays available as an upstream mirror. It installs as **Vexilyze TV** alongside Plezy. TV power control through a Google TV Streamer requires HDMI-CEC. The upstream project documentation and attribution follow.
+Choose the APK matching your device: ARM64, ARMv7 (32-bit ARM), or x86_64. The updater chooses automatically after the first install. Each APK compresses its native libraries; Android extracts those libraries during installation.
+
+The custom app lives on `vexilyze/android-tv`; `main` stays available as an upstream mirror. The package ID and release signing key remain the same as the first fork build, so existing fork installations can update in place. TV power control through a Google TV Streamer requires HDMI-CEC. See [upstream's naming terms](TRADEMARKS.md) before redistribution beyond personal use. The upstream documentation and attribution follow.
 
 ---
 
