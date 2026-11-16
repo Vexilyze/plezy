@@ -81,8 +81,9 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
-          sdkmanager --licenses < <(yes) > /dev/null
-          sdkmanager 'platforms;android-36' 'build-tools;36.1.0' 'ndk;29.0.14206865' 'cmake;4.1.2'
+          sdk_manager="${ANDROID_HOME:?}/cmdline-tools/latest/bin/sdkmanager"
+          "$sdk_manager" --licenses < <(yes) > /dev/null
+          "$sdk_manager" 'platforms;android-36' 'build-tools;36.1.0' 'ndk;29.0.14206865' 'cmake;4.1.2'
 
       - name: Install locked dependencies
         shell: bash
