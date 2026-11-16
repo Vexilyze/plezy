@@ -1,0 +1,5 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="tv_sleep_accessibility_label">Vexilyze TV sleep timer</string>
+    <string name="tv_sleep_accessibility_description">Lets the Vexilyze TV sleep timer put this Android TV device to sleep after saving playback progress. Your television follows only if HDMI-CEC power control is enabled. This service does not read screen content or monitor your actions.</string>
+</resources>

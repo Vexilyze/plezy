@@ -1,3 +1,5 @@
+import '../../widgets/brand_logo.dart';
+import '../../utils/build_identity.dart';
 import 'package:flutter/material.dart';
 import 'package:plezy/widgets/app_icon.dart';
 import 'package:material_symbols_icons/symbols.dart';
@@ -16,7 +18,7 @@ class AboutScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final appName = t.app.title;
+    const appName = appDisplayName;
 
     return FutureBuilder<AppVersion>(
       future: _appVersionFuture,
@@ -33,7 +35,7 @@ class AboutScreen extends StatelessWidget {
                     child: Column(
                       children: [
                         const SizedBox(height: 24),
-                        Image.asset('assets/plezy.png', width: 80, height: 80),
+                        const BrandLogo(size: 80),
                         const SizedBox(height: 16),
                         Text(appName, style: Theme.of(context).textTheme.headlineMedium?.copyWith(fontWeight: .bold)),
                         const SizedBox(height: 8),
@@ -44,7 +46,9 @@ class AboutScreen extends StatelessWidget {
                         ),
                         const SizedBox(height: 24),
                         Text(
-                          t.about.appDescription,
+                          isVexilyzeBuild
+                              ? 'An independent fork of Plezy with TV sleep and GitHub APK updates.'
+                              : t.about.appDescription,
                           style: Theme.of(context).textTheme.bodyLarge,
                           textAlign: TextAlign.center,
                         ),

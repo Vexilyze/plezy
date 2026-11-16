@@ -1,0 +1,180 @@
+name: Vexilyze TV Android release
+run-name: Vexilyze TV Android · ${{ github.ref_name }}
+
+on:
+  push:
+    tags:
+      - 'v[0-9]*+*'
+  workflow_dispatch:
+    inputs:
+      publish:
+        description: Publish the already-tagged version to GitHub Releases
+        type: boolean
+        default: false
+
+permissions:
+  contents: read
+
+concurrency:
+  group: vexilyze-android-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  build:
+    if: github.repository == 'Vexilyze/plezy'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 90
+    outputs:
+      release_tag: ${{ version.outputs.release_tag }}
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+
+      - name: Validate release source and version
+        id: version
+        shell: bash
+        env:
+          PUBLISH_RELEASE: ${{ github.event_name == 'push' || inputs.publish }}
+        run: |
+          set -euo pipefail
+          version=$(python3 scripts/pubspec_version.py)
+          release_tag="v$version"
+          case "$GITHUB_REF" in
+            refs/heads/vexilyze/android-tv) ;;
+            "refs/tags/$release_tag") ;;
+            *) echo 'Build from vexilyze/android-tv or its exact version tag.' >&2; exit 1 ;;
+          esac
+          if [[ "$PUBLISH_RELEASE" == true ]]; then
+            [[ "$(git rev-parse "refs/tags/$release_tag^{commit}")" == "$GITHUB_SHA" ]]
+          fi
+          echo "release_tag=$release_tag" >> "$GITHUB_OUTPUT"
+
+      - name: Check signing secrets
+        shell: bash
+        env:
+          ANDROID_KEYSTORE_BASE64: ${{ secrets.ANDROID_KEYSTORE_BASE64 }}
+          ANDROID_STORE_PASSWORD: ${{ secrets.ANDROID_STORE_PASSWORD }}
+          ANDROID_KEY_PASSWORD: ${{ secrets.ANDROID_KEY_PASSWORD }}
+          ANDROID_KEY_ALIAS: ${{ secrets.ANDROID_KEY_ALIAS }}
+        run: python3 scripts/fork/prepare_android_signing.py
+
+      - name: Setup Java
+        uses: actions/setup-java@03ad4de0992f5dab5e18fcb136590ce7c4a0ac95 # v5
+        with:
+          distribution: temurin
+          java-version: '21'
+
+      - name: Setup pinned Flutter
+        shell: bash
+        run: |
+          set -euo pipefail
+          sdk_root="$RUNNER_TEMP/vexilyze-flutter"
+          git clone --depth 1 --branch 3.47.1 https://github.com/flutter/flutter.git "$sdk_root"
+          [[ "$(git -C "$sdk_root" rev-parse HEAD)" == 6655482ec06e547f90abf8ae7590466f4415978d ]]
+          echo "$sdk_root/bin" >> "$GITHUB_PATH"
+          echo "FLUTTER_ROOT=$sdk_root" >> "$GITHUB_ENV"
+          "$sdk_root/bin/flutter" --version
+
+      - name: Setup Android build tools
+        shell: bash
+        run: |
+          set -euo pipefail
+          sdkmanager --licenses < <(yes) > /dev/null
+          sdkmanager 'platforms;android-36' 'build-tools;36.1.0' 'ndk;29.0.14206865' 'cmake;4.1.2'
+
+      - name: Install locked dependencies
+        shell: bash
+        run: flutter pub get --enforce-lockfile --no-example
+
+      - name: Install wakelock_plus development dependencies
+        working-directory: packages/wakelock_plus
+        shell: bash
+        run: flutter pub get --enforce-lockfile --no-example
+
+      - name: Analyze project
+        shell: bash
+        run: dart run scripts/checks/check_analyzer.dart
+
+      - name: Test release signing and packaging guards
+        shell: bash
+        run: python3 -m unittest discover -s scripts/fork -p 'test_*.py'
+
+      - name: Test fork playback and update behavior
+        shell: bash
+        run: |
+          flutter test \
+            test/services/android_update_test.dart \
+            test/widgets/android_update_dialog_test.dart \
+            test/services/tv_sleep_service_test.dart \
+            test/screens/settings/tv_sleep_settings_screen_test.dart \
+            test/screens/video_player/sleep_timer_completion_test.dart \
+            test/services/sleep_timer_service_test.dart \
+            test/screens/video_player/still_watching_sleep_timer_test.dart \
+            test/services/update_service_test.dart \
+            test/services/playback_source_resolver_test.dart \
+            test/services/playback_initialization_offline_cache_test.dart
+
+      - name: Build and verify signed universal APK
+        shell: bash
+        run: bash scripts/fork/build_android.sh
+
+      - name: Test Android update identity and launcher deep links
+        working-directory: android
+        shell: bash
+        run: |
+          ./gradlew :app:testDebugUnitTest -x :app:compileFlutterBuildDebug \
+            --tests com.edde746.plezy.updates.AndroidUpdatePluginTest \
+            --tests com.edde746.plezy.deeplink.DeepLinkPluginTest \
+            --tests com.edde746.plezy.watchnext.WatchNextProviderTest \
+            --tests com.edde746.plezy.watchnext.SystemShelfArtworkManifestTest \
+            --tests com.edde746.plezy.AppIconSwitcherTest \
+            --tests com.edde746.plezy.ExternalPlayerChannelTest
+
+      - name: Check Android API compatibility
+        working-directory: android
+        run: ./gradlew :app:lintDebug -x :app:compileFlutterBuildDebug
+
+      - name: Remove signing credentials
+        if: always()
+        shell: bash
+        run: rm -f android/app/vexilyze-release.jks android/key.properties
+
+      - name: Upload signed release artifacts
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7
+        with:
+          name: vexilyze-tv-android
+          path: build/fork-release/
+          if-no-files-found: error
+          retention-days: 30
+
+  publish:
+    needs: build
+    if: github.repository == 'Vexilyze/plezy' && (github.event_name == 'push' || inputs.publish)
+    runs-on: ubuntu-24.04
+    permissions:
+      contents: write
+    steps:
+      - name: Download verified APK and metadata
+        uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8
+        with:
+          name: vexilyze-tv-android
+          path: release
+
+      - name: Publish versioned release
+        shell: bash
+        env:
+          GH_TOKEN: ${{ github.token }}
+          GH_REPO: ${{ github.repository }}
+          RELEASE_TAG: ${{ needs.build.outputs.release_tag }}
+        run: |
+          set -euo pipefail
+          cd release
+          sha256sum --check vexilyze-tv-android.apk.sha256
+          gh release create "$RELEASE_TAG" \
+            --verify-tag \
+            --title "Vexilyze TV $RELEASE_TAG" \
+            --notes-file RELEASE_NOTES.md \
+            vexilyze-tv-android.apk vexilyze-tv-android.apk.sha256 \
+            release-signing-certificate.sha256 SOURCE.txt LICENSE

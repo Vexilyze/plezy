@@ -358,6 +358,8 @@ extension _VideoPlayerBuildMethods on VideoPlayerScreenState {
               // "Still watching?" overlay (hidden in PiP mode)
               VideoPlayerStillWatchingOverlay(
                 visible: _showStillWatchingPrompt,
+                sleepDevice:
+                    TvSleepService.isAndroidTv && SettingsService.instance.read(SettingsService.sleepTimerSleepDevice),
                 countdown: _stillWatchingCountdown,
                 pauseFocusNode: _stillWatchingPauseFocusNode,
                 continueFocusNode: _stillWatchingContinueFocusNode,

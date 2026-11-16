@@ -11,6 +11,7 @@ import '../../models/player_setting_scope.dart';
 import '../../utils/audio_channel_limit_labels.dart';
 import '../../utils/quality_preset_labels.dart';
 import '../../services/settings_service.dart';
+import '../../services/tv_sleep_service.dart';
 import '../../services/video_decode_capabilities.dart';
 import '../../utils/codec_utils.dart';
 import '../../utils/platform_detector.dart';
@@ -22,6 +23,7 @@ import 'external_player_screen.dart';
 import 'mpv_config_screen.dart';
 import 'settings_utils.dart';
 import 'subtitle_styling_screen.dart';
+import 'tv_sleep_settings_screen.dart';
 
 class PlaybackSettingsScreen extends StatelessWidget {
   const PlaybackSettingsScreen({super.key});
@@ -190,6 +192,13 @@ class PlaybackSettingsScreen extends StatelessWidget {
         labelText: t.settings.minutesLabel,
         suffixText: t.settings.minutesShort,
       ),
+      if (TvSleepService.isAndroidTv)
+        SettingNavigationTile(
+          icon: Symbols.tv_off_rounded,
+          title: t.tvSleep.title,
+          subtitle: t.tvSleep.settingDescription,
+          destinationBuilder: (_) => const TvSleepSettingsScreen(),
+        ),
     ],
   );
 

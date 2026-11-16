@@ -30,6 +30,43 @@ void main() {
     SleepTimerService().cancelTimer();
   });
 
+  testWidgets('unanswered player prompt completes the timer exactly once after its grace period', (tester) async {
+    final nativeInitialize = Completer<bool>();
+    final sleepTimer = SleepTimerService();
+    var completed = 0;
+    final completionSubscription = sleepTimer.onCompleted.listen((_) => completed++);
+    addTearDown(completionSubscription.cancel);
+    await withMockPlayerChannels(
+      methodChannelName: 'com.plezy/mpv_player',
+      eventChannelName: 'com.plezy/mpv_player/events',
+      methodHandler: (call) {
+        if (call.method == 'initialize') return nativeInitialize.future;
+        return Future<Object?>.value(null);
+      },
+      testBody: () async {
+        final key = GlobalKey<VideoPlayerScreenState>();
+        await tester.pumpWidget(_screen(key));
+        sleepTimer.startTimer(const Duration(minutes: 30));
+        sleepTimer.extendTimer(const Duration(minutes: -31));
+        await tester.pump(const Duration(seconds: 1));
+        await tester.pump();
+        expect(sleepTimer.hasPendingPrompt, isTrue);
+        await tester.pump(const Duration(seconds: 29));
+        expect(completed, 0);
+        await tester.pump(const Duration(seconds: 1));
+        await tester.pump();
+        expect(completed, 1);
+        expect(sleepTimer.hasPendingPrompt, isFalse);
+        await tester.pump(const Duration(seconds: 10));
+        expect(completed, 1);
+        sleepTimer.cancelTimer();
+        await tester.pumpWidget(const SizedBox.shrink());
+        nativeInitialize.complete(true);
+        await tester.pump();
+      },
+    );
+  });
+
   testWidgets('back on the visible still-watching prompt re-arms the sleep timer with its original duration', (
     tester,
   ) async {

@@ -460,6 +460,7 @@ class _PlayNextEpisodeHeader extends StatelessWidget {
 
 class VideoPlayerStillWatchingOverlay extends StatelessWidget {
   final bool visible;
+  final bool sleepDevice;
   final ValueListenable<int> countdown;
   final FocusNode pauseFocusNode;
   final FocusNode continueFocusNode;
@@ -470,6 +471,7 @@ class VideoPlayerStillWatchingOverlay extends StatelessWidget {
   const VideoPlayerStillWatchingOverlay({
     super.key,
     required this.visible,
+    this.sleepDevice = false,
     required this.countdown,
     required this.pauseFocusNode,
     required this.continueFocusNode,
@@ -493,7 +495,7 @@ class VideoPlayerStillWatchingOverlay extends StatelessWidget {
         ValueListenableBuilder<int>(
           valueListenable: countdown,
           builder: (context, seconds, child) => Text(
-            t.videoControls.pausingIn(seconds: '$seconds'),
+            sleepDevice ? t.tvSleep.sleepingIn(seconds: '$seconds') : t.videoControls.pausingIn(seconds: '$seconds'),
             style: const TextStyle(color: Colors.white, fontSize: 14, fontWeight: .w600),
           ),
         ),

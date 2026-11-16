@@ -4,6 +4,40 @@ import 'package:plezy/services/sleep_timer_service.dart';
 
 // Timer ticks and wall-clock arithmetic advance together in an isolated service.
 void main() {
+  test('only an unanswered prompt completes; Keep Watching, Cancel, and manual Pause cannot complete it', () {
+    fakeAsync((async) {
+      final epoch = DateTime.utc(2026, 7, 20, 12);
+      final service = SleepTimerService.withClock(() => epoch.add(async.elapsed));
+      var completions = 0;
+      service.bindPlayback(owner: Object(), onComplete: () => completions++);
+      void expire() {
+        service.startTimer(const Duration(seconds: 1));
+        async.elapse(const Duration(seconds: 1));
+        async.flushMicrotasks();
+        expect(service.hasPendingPrompt, isTrue);
+      }
+
+      expire();
+      service.restartTimer(); // Keep Watching
+      service.completePrompt(); // stale prompt timeout
+      expect(completions, 0);
+      expire();
+      service.cancelTimer();
+      service.completePrompt();
+      expect(completions, 0);
+      expire();
+      service.dismissPrompt(); // manual Pause
+      service.completePrompt();
+      expect(completions, 0);
+      expire();
+      service.completePrompt();
+      service.completePrompt();
+      expect(completions, 1);
+      service.dispose();
+      async.flushMicrotasks();
+    });
+  });
+
   test('duration expiry emits one prompt without completing playback', () {
     fakeAsync((async) {
       final epoch = DateTime.utc(2026, 7, 20, 12);

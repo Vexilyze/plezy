@@ -1,3 +1,5 @@
+import '../widgets/brand_logo.dart';
+import '../utils/build_identity.dart';
 import 'dart:async';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
@@ -281,10 +283,10 @@ class _AuthScreenState extends State<AuthScreen> {
                           mainAxisAlignment: .center,
                           crossAxisAlignment: .center,
                           children: [
-                            Image.asset('assets/plezy.png', width: 120, height: 120),
+                            const BrandLogo(size: 120),
                             const SizedBox(height: 24),
                             Text(
-                              t.app.title,
+                              appDisplayName,
                               style: Theme.of(context).textTheme.headlineMedium?.copyWith(fontWeight: .bold),
                               textAlign: TextAlign.center,
                             ),
@@ -310,10 +312,10 @@ class _AuthScreenState extends State<AuthScreen> {
                       mainAxisSize: .min,
                       crossAxisAlignment: .stretch,
                       children: [
-                        Image.asset('assets/plezy.png', width: 120, height: 120),
+                        const BrandLogo(size: 120),
                         const SizedBox(height: 24),
                         Text(
-                          t.app.title,
+                          appDisplayName,
                           style: Theme.of(context).textTheme.headlineMedium?.copyWith(fontWeight: .bold),
                           textAlign: TextAlign.center,
                         ),

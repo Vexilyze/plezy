@@ -22,6 +22,8 @@ class SleepTimerService extends ChangeNotifier {
   bool _needsRestart = false;
   bool _restartAsEndOfVideo = false;
   bool _endOfVideoArmed = false;
+  bool _promptPending = false;
+  int _revision = 0;
   final StreamController<void> _completedController = StreamController<void>.broadcast();
   final StreamController<void> _promptController = StreamController<void>.broadcast();
 
@@ -36,6 +38,11 @@ class SleepTimerService extends ChangeNotifier {
   /// Whether the sleep timer is armed to fire at the end of the current video
   /// rather than after a fixed duration.
   bool get isEndOfVideoMode => _endOfVideoArmed;
+
+  /// Changes when the viewer cancels or replaces the timer. A completion that
+  /// is still flushing progress must not sleep the device after that change.
+  int get revision => _revision;
+  bool get hasPendingPrompt => _promptPending;
 
   /// The time when the timer will complete
   DateTime? get endTime => _endTime;
@@ -85,6 +92,7 @@ class SleepTimerService extends ChangeNotifier {
 
       if (remaining == null || remaining.inSeconds <= 0) {
         appLogger.d('Sleep timer completed - showing prompt');
+        _promptPending = true;
         _stopTimerOnly();
         _promptController.add(null);
       } else {
@@ -119,8 +127,24 @@ class SleepTimerService extends ChangeNotifier {
     notifyListeners();
   }
 
+  /// Only an unanswered duration prompt completes the timer. A cancelled or
+  /// restarted countdown cannot later be completed by an old UI timeout.
+  void completePrompt() {
+    if (!_promptPending) return;
+    _promptPending = false;
+    _executeCallback();
+  }
+
+  /// A manual Pause answers the prompt without asking the device to sleep.
+  void dismissPrompt() {
+    _promptPending = false;
+    _revision++;
+  }
+
   /// Cancel the timer configuration and pending restart, keeping playback bound.
   void cancelTimer() {
+    _revision++;
+    _promptPending = false;
     if (_timer != null || _originalDuration != null || _endOfVideoArmed || _needsRestart || _restartAsEndOfVideo) {
       appLogger.d('Sleep timer cancelled');
       _timer?.cancel();

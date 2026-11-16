@@ -1,3 +1,4 @@
+import '../../utils/build_identity.dart';
 import 'dart:async';
 import 'dart:io';
 
@@ -485,11 +486,12 @@ class _LogsScreenState extends State<LogsScreen> with MountedSetStateMixin {
                                 tooltip: t.common.refresh,
                                 onPressed: _loadLogs,
                               ),
-                              FocusableAction(
-                                icon: Symbols.upload_rounded,
-                                tooltip: t.logs.uploadLogs,
-                                onPressed: _hasDiagnostics ? _uploadLogs : null,
-                              ),
+                              if (upstreamIntegrationsAvailable)
+                                FocusableAction(
+                                  icon: Symbols.upload_rounded,
+                                  tooltip: t.logs.uploadLogs,
+                                  onPressed: _hasDiagnostics ? _uploadLogs : null,
+                                ),
                               FocusableAction(
                                 icon: Symbols.content_copy_rounded,
                                 tooltip: t.logs.copyLogs,

@@ -35,6 +35,7 @@ import '../../services/settings_mutation_service.dart';
 import '../../services/supporter/supporter_mode.dart';
 import '../../widgets/background_download_warning_banner.dart';
 import '../../services/update_service.dart';
+import '../../services/android_update_release.dart';
 import '../../utils/dialogs.dart';
 import '../../utils/snackbar_helper.dart';
 import '../../utils/platform_detector.dart';
@@ -934,7 +935,14 @@ class _SettingsScreenState extends State<SettingsScreen> with FocusableTab, Moun
 
         if (updateInfo == null || updateInfo['hasUpdate'] != true) {
           showAppSnackBar(context, t.update.latestVersion);
+        } else {
+          _showUpdateDialog();
         }
+      }
+    } on NoCompatibleAndroidRelease {
+      if (mounted) {
+        setState(() => _isCheckingForUpdate = false);
+        showAppSnackBar(context, t.androidUpdater.noCompatibleRelease);
       }
     } catch (e) {
       if (mounted) {

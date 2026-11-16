@@ -74,6 +74,8 @@ import '../services/preferred_audio_device.dart';
 import '../services/scoped_player_prefs.dart';
 import '../services/settings_service.dart';
 import '../services/sleep_timer_service.dart';
+import '../services/tv_sleep_service.dart';
+import 'video_player/sleep_timer_completion.dart';
 import '../services/subtitle_preference.dart';
 import '../services/track_manager.dart';
 import '../services/track_selection_service.dart';
@@ -821,6 +823,8 @@ class VideoPlayerScreenState extends State<VideoPlayerScreen>
   StreamSubscription<AppleTvRemotePlayPauseAction>? _appleTvPlayPauseSubscription;
   TrackManager? _trackManager;
   StreamSubscription<void>? _sleepTimerSubscription;
+  int _sleepCompletionGeneration = 0;
+  bool _sleepTimerStoppedProgress = false;
   bool _isHandlingBack = false;
 
   /// Cancel scope for the screen's player-driven stream subscriptions — the
@@ -1221,6 +1225,8 @@ class VideoPlayerScreenState extends State<VideoPlayerScreen>
   }
 
   Future<void> _playWithPlaybackIntent(Player currentPlayer) {
+    _sleepCompletionGeneration++;
+    _resumeProgressAfterSleepTimer();
     if (_shuttingDown) return Future<void>.value();
     if (!automotivePlaybackAllowedNow()) {
       _playbackIntentShouldPlay = false;
@@ -1251,6 +1257,8 @@ class VideoPlayerScreenState extends State<VideoPlayerScreen>
   }
 
   Future<void> _playOrPauseWithPlaybackIntent(Player currentPlayer) {
+    _sleepCompletionGeneration++;
+    _resumeProgressAfterSleepTimer();
     if (_shuttingDown) return Future<void>.value();
     if (!automotivePlaybackAllowedNow()) {
       appLogger.d('Play/pause requested while Android Automotive app is not resumed; keeping playback paused');
@@ -1401,10 +1409,7 @@ class VideoPlayerScreenState extends State<VideoPlayerScreen>
     SleepTimerService().bindPlayback(
       owner: this,
       onComplete: () {
-        final currentPlayer = player;
-        if (mounted && !_shuttingDown && currentPlayer != null) {
-          _dispatchPlaybackIntent(_pauseWithPlaybackIntent(currentPlayer), source: 'Sleep timer');
-        }
+        unawaited(_completeSleepTimer());
       },
     );
     // Downloads join too: a download of a server that is online is the
@@ -1548,7 +1553,7 @@ class VideoPlayerScreenState extends State<VideoPlayerScreen>
     _setupAppleTvRemotePlaybackActions();
 
     _sleepTimerSubscription = SleepTimerService().onPrompt.listen((_) {
-      if (mounted) _showStillWatchingDialog();
+      if (mounted && SleepTimerService().hasPendingPrompt) _showStillWatchingDialog();
     });
 
     if (PlatformDetector.isAutomotive()) {

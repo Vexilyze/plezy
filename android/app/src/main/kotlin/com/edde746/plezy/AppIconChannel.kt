@@ -38,7 +38,8 @@ internal class AppIconSwitcher(private val packageManager: PackageManager, priva
    * not a target for alternate icons; neither offers the picker. [INFERENCE] for Fire TV: no device
    * confirmed that its launcher follows an alias switch.
    */
-  fun isSupported(): Boolean = !packageManager.hasSystemFeature(FEATURE_FIRE_TV) &&
+  fun isSupported(): Boolean = packageName == "com.edde746.plezy" &&
+    !packageManager.hasSystemFeature(FEATURE_FIRE_TV) &&
     !packageManager.hasSystemFeature(PackageManager.FEATURE_AUTOMOTIVE) &&
     DEFAULT_ICON in aliases &&
     aliases.size > 1

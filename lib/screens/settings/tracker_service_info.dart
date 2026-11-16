@@ -1,3 +1,4 @@
+import '../../utils/build_identity.dart';
 import 'package:flutter/widgets.dart';
 import 'package:provider/provider.dart';
 
@@ -60,40 +61,42 @@ class TrackerServiceInfo {
 
   /// Display order shared by every list. Built per call because [displayName]
   /// reads the active locale.
-  static List<TrackerServiceInfo> get all => [
-    TrackerServiceInfo(
-      service: TrackerService.trakt,
-      displayName: t.trakt.title,
-      logoSource: CatalogSourceId.trakt,
-      ratingSource: TraktTracker.instance,
-      isConnected: (context) => context.watch<TrackersProvider>().isTraktConnected,
-      username: (context) => context.watch<TrackersProvider>().traktUsername,
-      startConnection: startTraktConnection,
-      buildSettingsScreen: () => const TraktSettingsScreen(),
-    ),
-    TrackerServiceInfo.shared(
-      TrackerConfig.mal(),
-      logoSource: CatalogSourceId.mal,
-      ratingSource: MalTracker.instance,
-      startConnection: startMalConnection,
-    ),
-    TrackerServiceInfo.shared(
-      TrackerConfig.anilist(),
-      logoSource: CatalogSourceId.anilist,
-      ratingSource: AnilistTracker.instance,
-      startConnection: startAnilistConnection,
-    ),
-    TrackerServiceInfo.shared(
-      TrackerConfig.simkl(),
-      logoSource: CatalogSourceId.simkl,
-      ratingSource: SimklTracker.instance,
-      startConnection: startSimklConnection,
-    ),
-    TrackerServiceInfo.shared(
-      TrackerConfig.mdblist(),
-      logoSource: CatalogSourceId.mdblist,
-      ratingSource: MdblistTracker.instance,
-      startConnection: startMdblistConnection,
-    ),
-  ];
+  static List<TrackerServiceInfo> get all => !upstreamIntegrationsAvailable
+      ? const []
+      : [
+          TrackerServiceInfo(
+            service: TrackerService.trakt,
+            displayName: t.trakt.title,
+            logoSource: CatalogSourceId.trakt,
+            ratingSource: TraktTracker.instance,
+            isConnected: (context) => context.watch<TrackersProvider>().isTraktConnected,
+            username: (context) => context.watch<TrackersProvider>().traktUsername,
+            startConnection: startTraktConnection,
+            buildSettingsScreen: () => const TraktSettingsScreen(),
+          ),
+          TrackerServiceInfo.shared(
+            TrackerConfig.mal(),
+            logoSource: CatalogSourceId.mal,
+            ratingSource: MalTracker.instance,
+            startConnection: startMalConnection,
+          ),
+          TrackerServiceInfo.shared(
+            TrackerConfig.anilist(),
+            logoSource: CatalogSourceId.anilist,
+            ratingSource: AnilistTracker.instance,
+            startConnection: startAnilistConnection,
+          ),
+          TrackerServiceInfo.shared(
+            TrackerConfig.simkl(),
+            logoSource: CatalogSourceId.simkl,
+            ratingSource: SimklTracker.instance,
+            startConnection: startSimklConnection,
+          ),
+          TrackerServiceInfo.shared(
+            TrackerConfig.mdblist(),
+            logoSource: CatalogSourceId.mdblist,
+            ratingSource: MdblistTracker.instance,
+            startConnection: startMdblistConnection,
+          ),
+        ];
 }

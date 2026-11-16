@@ -292,6 +292,10 @@ android {
   buildToolsVersion = "36.1.0"
   ndkVersion = "29.0.14206865"
 
+  buildFeatures {
+    buildConfig = true // Runtime provider authorities follow the fork applicationId.
+  }
+
   // Android Automotive OS driver-distraction state (CarUxRestrictionsManager). This is a platform
   // stub, not a shipped dependency: the classes exist only on AAOS images, so every use is guarded
   // by FEATURE_AUTOMOTIVE and the manifest declares `uses-library android.car required=false`.
@@ -303,7 +307,7 @@ android {
   }
 
   defaultConfig {
-    applicationId = "com.edde746.plezy"
+    applicationId = "com.vexilyze.tv"
     minSdk = 25 // Fire OS 6.x (API 25); the mpv-android AAR shares the same floor
     targetSdk = flutter.targetSdkVersion
     versionCode = flutter.versionCode
@@ -340,7 +344,7 @@ android {
       val keystorePropertiesFile = rootProject.file("key.properties")
       if (keystorePropertiesFile.exists()) {
         val keystoreProperties = Properties()
-        keystoreProperties.load(FileInputStream(keystorePropertiesFile))
+        FileInputStream(keystorePropertiesFile).use { keystoreProperties.load(it) }
 
         keyAlias = keystoreProperties["keyAlias"] as String
         keyPassword = keystoreProperties["keyPassword"] as String
@@ -352,12 +356,9 @@ android {
 
   buildTypes {
     release {
-      // Only use release signing if key.properties exists (not in CI/CD)
-      val keystorePropertiesFile = rootProject.file("key.properties")
-      if (keystorePropertiesFile.exists()) {
-        signingConfig = signingConfigs.getByName("release")
-      }
-      // If key.properties doesn't exist, it will use debug signing for CI builds
+      // Every distributable fork build uses the same release key. Missing
+      // credentials fail preReleaseBuild below; never fall back to debug signing.
+      signingConfig = signingConfigs.getByName("release")
       ndk {
         debugSymbolLevel = "FULL"
       }
@@ -383,8 +384,7 @@ android {
       isShrinkResources = false
       testProguardFiles("proguard-test-rules.pro")
       proguardFile("proguard-instrumentation-rules.pro")
-      // Release has no signing config unless key.properties exists, which would leave
-      // this variant unsigned and uninstallable in CI.
+      // Test artifacts deliberately use the debug key, never the release key.
       signingConfig = signingConfigs.getByName("debug")
       // Plugin subprojects only publish debug and release variants.
       matchingFallbacks += listOf("debug", "release")
@@ -426,6 +426,25 @@ android {
     checkOnly += setOf("NewApi")
   }
 }
+
+val requireReleaseSigning = tasks.register("requireReleaseSigning") {
+  doLast {
+    val signing = android.signingConfigs.getByName("release")
+    if (signing.storeFile?.isFile != true ||
+      signing.storePassword.isNullOrBlank() ||
+      signing.keyAlias.isNullOrBlank() ||
+      signing.keyPassword.isNullOrBlank()
+    ) {
+      throw GradleException(
+        "Vexilyze TV release signing is missing. Configure android/key.properties; see docs/fork/RELEASING.md."
+      )
+    }
+    if (signing.keyAlias.equals("androiddebugkey", ignoreCase = true)) {
+      throw GradleException("Vexilyze TV release builds must not use the Android debug key.")
+    }
+  }
+}
+tasks.matching { it.name == "preReleaseBuild" }.configureEach { dependsOn(requireReleaseSigning) }
 
 // BackgroundWorkDiagnostics routes users to background_downloader's private
 // notification channel. Fail the build if an upstream ref changes that ID.

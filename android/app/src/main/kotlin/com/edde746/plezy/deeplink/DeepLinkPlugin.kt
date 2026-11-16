@@ -6,7 +6,7 @@ import io.flutter.plugin.common.MethodCall
 import io.flutter.plugin.common.MethodChannel
 
 /**
- * Hands every `plezy:` link to Dart unchanged. The link grammar lives only in
+ * Hands every `vexilyzetv:` link to Dart unchanged. The link grammar lives only in
  * `lib/services/deep_links/deep_link.dart`, so nothing here reads hosts or
  * query parameters.
  */
@@ -15,7 +15,7 @@ class DeepLinkPlugin :
   MethodChannel.MethodCallHandler {
   companion object {
     private const val METHOD_CHANNEL = "com.plezy/deep_link"
-    private const val SCHEME = "plezy"
+    private const val SCHEME = "vexilyzetv"
 
     // One slot, latest link wins. It lives here rather than on the instance so a
     // link Dart has not accepted yet survives the engine being re-created.

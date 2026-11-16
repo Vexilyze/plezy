@@ -1,3 +1,4 @@
+import '../utils/build_identity.dart';
 import 'dart:async';
 
 import 'package:dart_discord_presence/dart_discord_presence.dart';
@@ -102,7 +103,7 @@ class DiscordRPCService {
   final DiscordRPC Function() _rpcFactory;
 
   static bool get isAvailable {
-    if (!PlatformDetector.isDesktopOS()) {
+    if (!upstreamIntegrationsAvailable || !PlatformDetector.isDesktopOS()) {
       return false;
     }
     return DiscordRPC.isAvailable;

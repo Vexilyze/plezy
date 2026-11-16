@@ -8,6 +8,7 @@ import '../i18n/app_locale_utils.dart';
 import '../i18n/strings.g.dart';
 import '../media/media_kind.dart';
 import '../utils/app_logger.dart';
+import '../utils/build_identity.dart';
 import '../utils/external_ids.dart';
 import '../utils/json_utils.dart';
 
@@ -347,7 +348,7 @@ class PlexDiscoverClient {
       'Content-Type': 'application/json',
       'X-Plex-Token': session.accessToken,
       'X-Plex-Client-Identifier': session.clientIdentifier,
-      'X-Plex-Product': 'Plezy',
+      'X-Plex-Product': appDisplayName,
       'X-Plex-Version': '2',
       // Read per request so a language switch applies on the next fetch.
       // Discover localizes titles, summaries and shelf names from this.

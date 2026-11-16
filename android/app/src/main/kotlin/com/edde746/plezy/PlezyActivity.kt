@@ -36,6 +36,7 @@ import com.edde746.plezy.mpv.MpvPlayerPlugin
 import com.edde746.plezy.shared.AssistiveTechnologyMonitor
 import com.edde746.plezy.shared.DeviceQuirks
 import com.edde746.plezy.shared.ThemeHelper
+import com.edde746.plezy.updates.AndroidUpdatePlugin
 import com.edde746.plezy.watchnext.WatchNextPlugin
 import io.flutter.embedding.android.FlutterActivity
 import io.flutter.embedding.android.FlutterTextureView
@@ -131,6 +132,7 @@ class PlezyActivity : FlutterActivity() {
   private var flutterTextureView: FlutterTextureView? = null
   private var flutterSurfaceReconnectPending = false
   private var activityStarted = false
+  private val tvSleepChannel by lazy { TvSleepChannel(this) }
   private val externalPlayerChannel = ExternalPlayerChannel(this)
   private val userCertificateChannel = UserCertificateChannel()
   private val appIconChannel = AppIconChannel(this)
@@ -623,6 +625,7 @@ class PlezyActivity : FlutterActivity() {
   }
 
   override fun onDestroy() {
+    tvSleepChannel.dispose()
     externalPlayerChannel.dispose()
     systemBarsInsetsHost?.setOnApplyWindowInsetsListener(null)
     systemBarsInsetsHost = null
@@ -1006,6 +1009,8 @@ class PlezyActivity : FlutterActivity() {
       }
     }
 
+    flutterEngine.plugins.add(AndroidUpdatePlugin())
+    tvSleepChannel.attach(flutterEngine.dartExecutor.binaryMessenger)
     flutterEngine.plugins.add(WatchNextPlugin())
     flutterEngine.plugins.add(deepLinkPlugin)
 

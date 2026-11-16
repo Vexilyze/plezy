@@ -1,3 +1,4 @@
+import '../utils/build_identity.dart';
 import 'dart:async';
 
 import 'package:flutter/foundation.dart';
@@ -198,6 +199,7 @@ class TrackersProvider extends ChangeNotifier with DisposableChangeNotifierMixin
     // that races this load only suppresses its own service (whose generation
     // moves) rather than dropping the freshly-loaded sessions for the others.
     final rebinds = [for (final slot in _slots) slot.rebindGeneration];
+    if (!upstreamIntegrationsAvailable) return;
     final results = await Future.wait<TrackerSession?>([for (final slot in _slots) slot.store.load(userUuid)]);
     if (!_isCurrentProfileBinding(userUuid, generation)) return;
     for (var i = 0; i < _slots.length; i++) {
@@ -359,6 +361,7 @@ class TrackersProvider extends ChangeNotifier with DisposableChangeNotifierMixin
     TrackerSession? replaces,
     bool Function()? keepQueuedWrites,
   }) async {
+    if (!upstreamIntegrationsAvailable) return false;
     if (isDisposed || _connecting != null || !identical(slot.session, replaces)) return false;
 
     final service = slot.service;

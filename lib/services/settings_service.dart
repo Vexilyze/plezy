@@ -660,6 +660,8 @@ class SettingsService extends BaseSharedPreferencesService {
   static const showServerNameOnHubs = BoolPref('show_server_name_on_hubs');
   static const groupLibrariesByServer = BoolPref('group_libraries_by_server', defaultValue: true);
   static const sleepTimerDuration = IntPref('sleep_timer_duration', defaultValue: 30);
+  // Device-local opt-in: accessibility permission cannot travel with an export.
+  static const sleepTimerSleepDevice = BoolPref('sleep_timer_sleep_device');
   static const audioSyncOffset = IntPref('audio_sync_offset');
   static const subtitleSyncOffset = IntPref('subtitle_sync_offset');
   static const subtitleSearchLanguage = NullableStringPref('subtitle_search_language');
@@ -1629,6 +1631,7 @@ class SettingsService extends BaseSharedPreferencesService {
   /// per-device state plus user-authored player configuration, none of which
   /// should travel between installations.
   static final List<Pref<Object?>> _resetOnlyPrefs = [
+    sleepTimerSleepDevice,
     customDownloadPathType,
     mediaVersionPreferences,
     localLastPlayedAt,

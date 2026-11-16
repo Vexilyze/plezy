@@ -814,6 +814,11 @@ extension _VideoPlayerPlaybackServiceMethods on VideoPlayerScreenState {
     // Play Next prompt) a play press still reports playing while nothing
     // advances, and a lock taken there keeps a finished item lit until
     // someone comes back.
+    if (isPlaying && _sleepTimerStoppedProgress) {
+      // A native/media-session resume can bypass the explicit play wrappers.
+      _sleepCompletionGeneration++;
+      _resumeProgressAfterSleepTimer();
+    }
     unawaited(_wakelockController.setEnabled(isPlaying && !(player?.state.completed ?? false)));
 
     if (isPlaying) {

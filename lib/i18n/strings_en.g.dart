@@ -94,6 +94,8 @@ class Translations with BaseTranslations<AppLocale, Translations> {
 	late final Translations$seerr$en seerr = Translations$seerr$en.internal(_root);
 	late final Translations$services$en services = Translations$services$en.internal(_root);
 	late final Translations$addServer$en addServer = Translations$addServer$en.internal(_root);
+	late final Translations$tvSleep$en tvSleep = Translations$tvSleep$en.internal(_root);
+	late final Translations$androidUpdater$en androidUpdater = Translations$androidUpdater$en.internal(_root);
 	late final Translations$deepLinks$en deepLinks = Translations$deepLinks$en.internal(_root);
 }
 
@@ -6113,6 +6115,117 @@ class Translations$addServer$en {
 	String redirectUnsupportedEnterFinal({required Object product}) => 'The server redirected to an unsupported URL. Enter the final ${product} URL directly.';
 }
 
+// Path: tvSleep
+class Translations$tvSleep$en {
+	Translations$tvSleep$en.internal(this._root);
+
+	final Translations _root; // ignore: unused_field
+
+	// Translations
+
+	/// en: 'TV sleep timer'
+	String get title => 'TV sleep timer';
+
+	/// en: 'Sleeping in ${seconds}s'
+	String sleepingIn({required Object seconds}) => 'Sleeping in ${seconds}s';
+
+	/// en: 'Put this device to sleep when the video sleep timer finishes'
+	String get settingDescription => 'Put this device to sleep when the video sleep timer finishes';
+
+	/// en: 'The sleep timer can pause playback, save your progress, and put this Android TV device to sleep. On a Google TV Streamer, your television turns off only when HDMI-CEC power control is enabled on both devices.'
+	String get description => 'The sleep timer can pause playback, save your progress, and put this Android TV device to sleep. On a Google TV Streamer, your television turns off only when HDMI-CEC power control is enabled on both devices.';
+
+	/// en: 'Sleep this device when the timer finishes'
+	String get enable => 'Sleep this device when the timer finishes';
+
+	/// en: 'Applies after the unanswered countdown or at the end of the current video. Keep Watching and Cancel leave the device awake.'
+	String get enableDescription => 'Applies after the unanswered countdown or at the end of the current video. Keep Watching and Cancel leave the device awake.';
+
+	/// en: 'Open accessibility settings'
+	String get openSettings => 'Open accessibility settings';
+
+	/// en: 'Checking sleep permission…'
+	String get checkingPermission => 'Checking sleep permission…';
+
+	/// en: 'Sleep permission is enabled'
+	String get permissionReady => 'Sleep permission is enabled';
+
+	/// en: 'Enable Vexilyze TV sleep timer in Android accessibility settings'
+	String get permissionRequired => 'Enable Vexilyze TV sleep timer in Android accessibility settings';
+
+	/// en: 'Device sleep needs Android TV 9 or later'
+	String get unsupported => 'Device sleep needs Android TV 9 or later';
+
+	/// en: 'Enable the Vexilyze TV sleep timer service, then return here. It uses Android’s screen-lock action and does not read screen content or monitor your actions. If Android blocks a sideloaded service, allow restricted settings for Vexilyze TV in the device’s app settings first.'
+	String get setupHint => 'Enable the Vexilyze TV sleep timer service, then return here. It uses Android’s screen-lock action and does not read screen content or monitor your actions. If Android blocks a sideloaded service, allow restricted settings for Vexilyze TV in the device’s app settings first.';
+
+	/// en: 'Playback paused. Enable Vexilyze TV sleep timer in Android accessibility settings to put the device to sleep.'
+	String get permissionLost => 'Playback paused. Enable Vexilyze TV sleep timer in Android accessibility settings to put the device to sleep.';
+
+	/// en: 'Playback paused, but Android could not put the device to sleep.'
+	String get sleepFailed => 'Playback paused, but Android could not put the device to sleep.';
+
+	/// en: 'Could not open Android accessibility settings. Open them from your device settings.'
+	String get settingsFailed => 'Could not open Android accessibility settings. Open them from your device settings.';
+}
+
+// Path: androidUpdater
+class Translations$androidUpdater$en {
+	Translations$androidUpdater$en.internal(this._root);
+
+	final Translations _root; // ignore: unused_field
+
+	// Translations
+
+	/// en: 'Download and install'
+	String get downloadAndInstall => 'Download and install';
+
+	/// en: 'Downloading update…'
+	String get downloading => 'Downloading update…';
+
+	/// en: 'Checking the update…'
+	String get verifying => 'Checking the update…';
+
+	/// en: '${received} MB of ${total} MB'
+	String progress({required Object received, required Object total}) => '${received} MB of ${total} MB';
+
+	/// en: 'Install update'
+	String get install => 'Install update';
+
+	/// en: 'Allow installation'
+	String get allowInstallation => 'Allow installation';
+
+	/// en: 'Allow this app to install updates in Android settings, then return here. Android will ask you to confirm the installation.'
+	String get permissionRequired => 'Allow this app to install updates in Android settings, then return here. Android will ask you to confirm the installation.';
+
+	/// en: 'Finish the update in Android's installer. If you cancelled, you can open the installer again.'
+	String get installerOpened => 'Finish the update in Android\'s installer. If you cancelled, you can open the installer again.';
+
+	/// en: 'No compatible Android release is published for this device yet.'
+	String get noCompatibleRelease => 'No compatible Android release is published for this device yet.';
+
+	/// en: 'The update could not be downloaded. Check your connection and available storage, then try again.'
+	String get downloadFailed => 'The update could not be downloaded. Check your connection and available storage, then try again.';
+
+	/// en: 'The update download is incomplete or failed verification. Download it again.'
+	String get invalidDownload => 'The update download is incomplete or failed verification. Download it again.';
+
+	/// en: 'This update belongs to a different app and cannot be installed.'
+	String get wrongPackage => 'This update belongs to a different app and cannot be installed.';
+
+	/// en: 'This update was signed with a different key and cannot update this installation.'
+	String get wrongSignature => 'This update was signed with a different key and cannot update this installation.';
+
+	/// en: 'This APK is not newer than the version already installed.'
+	String get notNewer => 'This APK is not newer than the version already installed.';
+
+	/// en: 'This update does not support this device's Android version or processor.'
+	String get unsupported => 'This update does not support this device\'s Android version or processor.';
+
+	/// en: 'Android could not open the installer. Check that installing apps is allowed on this device, then try again.'
+	String get installFailed => 'Android could not open the installer. Check that installing apps is allowed on this device, then try again.';
+}
+
 // Path: deepLinks
 class Translations$deepLinks$en {
 	Translations$deepLinks$en.internal(this._root);
@@ -10439,6 +10552,37 @@ extension on Translations {
 			'addServer.redirectDifferentHost' => ({required Object product}) => 'The server redirected to a different host. Enter the final ${product} URL directly.',
 			'addServer.redirectInsecure' => 'The server redirected from HTTPS to an insecure URL',
 			'addServer.redirectUnsupportedEnterFinal' => ({required Object product}) => 'The server redirected to an unsupported URL. Enter the final ${product} URL directly.',
+			'tvSleep.title' => 'TV sleep timer',
+			'tvSleep.sleepingIn' => ({required Object seconds}) => 'Sleeping in ${seconds}s',
+			'tvSleep.settingDescription' => 'Put this device to sleep when the video sleep timer finishes',
+			'tvSleep.description' => 'The sleep timer can pause playback, save your progress, and put this Android TV device to sleep. On a Google TV Streamer, your television turns off only when HDMI-CEC power control is enabled on both devices.',
+			'tvSleep.enable' => 'Sleep this device when the timer finishes',
+			'tvSleep.enableDescription' => 'Applies after the unanswered countdown or at the end of the current video. Keep Watching and Cancel leave the device awake.',
+			'tvSleep.openSettings' => 'Open accessibility settings',
+			'tvSleep.checkingPermission' => 'Checking sleep permission…',
+			'tvSleep.permissionReady' => 'Sleep permission is enabled',
+			'tvSleep.permissionRequired' => 'Enable Vexilyze TV sleep timer in Android accessibility settings',
+			'tvSleep.unsupported' => 'Device sleep needs Android TV 9 or later',
+			'tvSleep.setupHint' => 'Enable the Vexilyze TV sleep timer service, then return here. It uses Android’s screen-lock action and does not read screen content or monitor your actions. If Android blocks a sideloaded service, allow restricted settings for Vexilyze TV in the device’s app settings first.',
+			'tvSleep.permissionLost' => 'Playback paused. Enable Vexilyze TV sleep timer in Android accessibility settings to put the device to sleep.',
+			'tvSleep.sleepFailed' => 'Playback paused, but Android could not put the device to sleep.',
+			'tvSleep.settingsFailed' => 'Could not open Android accessibility settings. Open them from your device settings.',
+			'androidUpdater.downloadAndInstall' => 'Download and install',
+			'androidUpdater.downloading' => 'Downloading update…',
+			'androidUpdater.verifying' => 'Checking the update…',
+			'androidUpdater.progress' => ({required Object received, required Object total}) => '${received} MB of ${total} MB',
+			'androidUpdater.install' => 'Install update',
+			'androidUpdater.allowInstallation' => 'Allow installation',
+			'androidUpdater.permissionRequired' => 'Allow this app to install updates in Android settings, then return here. Android will ask you to confirm the installation.',
+			'androidUpdater.installerOpened' => 'Finish the update in Android\'s installer. If you cancelled, you can open the installer again.',
+			'androidUpdater.noCompatibleRelease' => 'No compatible Android release is published for this device yet.',
+			'androidUpdater.downloadFailed' => 'The update could not be downloaded. Check your connection and available storage, then try again.',
+			'androidUpdater.invalidDownload' => 'The update download is incomplete or failed verification. Download it again.',
+			'androidUpdater.wrongPackage' => 'This update belongs to a different app and cannot be installed.',
+			'androidUpdater.wrongSignature' => 'This update was signed with a different key and cannot update this installation.',
+			'androidUpdater.notNewer' => 'This APK is not newer than the version already installed.',
+			'androidUpdater.unsupported' => 'This update does not support this device\'s Android version or processor.',
+			'androidUpdater.installFailed' => 'Android could not open the installer. Check that installing apps is allowed on this device, then try again.',
 			'deepLinks.invalid' => 'This Plezy link isn\'t valid.',
 			'deepLinks.profileNotFound' => ({required Object profile}) => 'No profile matches "${profile}".',
 			'deepLinks.serverUnavailable' => 'Couldn\'t reach the server for this link.',

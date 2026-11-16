@@ -1,3 +1,4 @@
+import '../utils/build_identity.dart';
 import 'dart:convert';
 
 import '../utils/media_server_http_client.dart';
@@ -48,6 +49,9 @@ String constrainLogUploadPayload({required String header, required String logs, 
 /// [payload] must already be redacted and allowlisted by the caller; this
 /// function performs no sanitisation of its own.
 Future<String> uploadDiagnosticText(String payload, {MediaServerHttpClient? client}) async {
+  if (!upstreamIntegrationsAvailable) {
+    throw StateError('Log uploads are not configured for this build. Copy logs instead.');
+  }
   final response = await (client ?? httpClient).post(
     logUploadEndpoint,
     body: payload,

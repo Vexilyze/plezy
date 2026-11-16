@@ -7,15 +7,26 @@ import 'package:plezy/utils/app_version.dart';
 import 'package:plezy/utils/media_server_http_client.dart';
 import 'package:plezy/utils/platform_detector.dart';
 import 'base_shared_preferences_service.dart';
+import 'android_update_release.dart';
+import 'android_update_service.dart';
 
 /// Service to check for new versions on GitHub
-/// Only enabled when ENABLE_UPDATE_CHECK build flag is set
+/// Enabled by default on Android; ENABLE_UPDATE_CHECK overrides the default.
 ///
 /// On macOS (non-Homebrew) and installed Windows: delegates to Sparkle/WinSparkle
 /// via auto_updater for native update dialogs and in-app installs.
-/// On all other platforms: falls back to GitHub API check + browser link dialog.
+/// Android downloads verified APKs and hands them to the system installer.
+/// Other platforms fall back to a GitHub API check and browser release link.
 class UpdateService {
-  static const String _githubRepo = 'edde746/plezy';
+  static String get githubRepository {
+    const configured = String.fromEnvironment('UPDATE_REPOSITORY');
+    final repository = configured.isNotEmpty ? configured : (Platform.isAndroid ? 'Vexilyze/plezy' : 'edde746/plezy');
+    if (!RegExp(r'^[A-Za-z0-9_.-]+/[A-Za-z0-9_.-]+$').hasMatch(repository)) {
+      throw const FormatException('Invalid update repository');
+    }
+    return repository;
+  }
+
   static const String _feedUrl = 'https://cdn.jsdelivr.net/gh/edde746/plezy@appcast/appcast.xml';
 
   static const String _keySkippedVersion = 'update_skipped_version';
@@ -28,7 +39,9 @@ class UpdateService {
 
   /// Check if update checking is enabled via build flag
   static bool get isUpdateCheckEnabled {
-    return const bool.fromEnvironment('ENABLE_UPDATE_CHECK', defaultValue: false);
+    return const bool.hasEnvironment('ENABLE_UPDATE_CHECK')
+        ? const bool.fromEnvironment('ENABLE_UPDATE_CHECK')
+        : Platform.isAndroid;
   }
 
   /// Whether any in-app update path applies to this install.
@@ -146,6 +159,10 @@ class UpdateService {
     }
 
     try {
+      if (Platform.isAndroid) {
+        if (respectCooldown) await _updateLastCheckTime();
+        return await _checkAndroidRelease(client ?? httpClient, respectSkippedVersion: respectCooldown);
+      }
       // Without the running version there is nothing to compare a release to.
       final currentVersion = (await AppVersion.current()).version;
       if (currentVersion == null) throw StateError('App version unknown');
@@ -155,7 +172,7 @@ class UpdateService {
       }
 
       final response = await (client ?? httpClient).get(
-        'https://api.github.com/repos/$_githubRepo/releases/latest',
+        'https://api.github.com/repos/$githubRepository/releases/latest',
         headers: {'Accept': 'application/vnd.github+json'},
       );
 
@@ -173,7 +190,7 @@ class UpdateService {
       if (hasUpdate) {
         // Check if this version was skipped
         final skippedVersion = await getSkippedVersion();
-        if (skippedVersion == cleanVersion) {
+        if (respectCooldown && skippedVersion == cleanVersion) {
           return null;
         }
 
@@ -195,6 +212,55 @@ class UpdateService {
     return null;
   }
 
+  static Future<Map<String, dynamic>?> _checkAndroidRelease(
+    MediaServerHttpClient client, {
+    required bool respectSkippedVersion,
+  }) async {
+    final device = await AndroidUpdateInstaller.device();
+    final repository = githubRepository;
+    final releases = <dynamic>[];
+    // Unlike /latest, the release list can find an Android build behind a
+    // newer desktop-only release. Bound pagination to protect the API quota.
+    for (var page = 1; page <= 3; page++) {
+      final response = await client.get(
+        'https://api.github.com/repos/$repository/releases?per_page=100&page=$page',
+        headers: {'Accept': 'application/vnd.github+json'},
+        timeout: const Duration(seconds: 20),
+      );
+      if (response.statusCode != 200 || response.data is! List) {
+        throw StateError('Release check returned HTTP ${response.statusCode} or invalid metadata');
+      }
+      final pageReleases = response.data as List;
+      releases.addAll(pageReleases);
+      if (pageReleases.length < 100) break;
+    }
+    final compatible = AndroidUpdateRelease.newestCompatible(
+      releases,
+      repository: repository,
+      supportedAbis: device.abis,
+    );
+    if (compatible == null) throw const NoCompatibleAndroidRelease();
+    final release = AndroidUpdateRelease.newestCompatible(
+      releases,
+      repository: repository,
+      supportedAbis: device.abis,
+      installedVersion: device.version,
+      installedBuild: device.build,
+    );
+    if (release == null) return null;
+    if (respectSkippedVersion && await getSkippedVersion() == release.versionLabel) return null;
+    return {
+      'hasUpdate': true,
+      'currentVersion': '${device.version}+${device.build}',
+      'latestVersion': release.versionLabel,
+      'releaseUrl': release.releaseUrl,
+      'releaseName': release.name,
+      'releaseNotes': release.notes,
+      'publishedAt': release.publishedAt.toIso8601String(),
+      'androidRelease': release,
+    };
+  }
+
   @visibleForTesting
   static Future<Map<String, dynamic>?> debugPerformUpdateCheck({
     required bool respectCooldown,
@@ -210,8 +276,8 @@ class UpdateService {
   }
 
   /// Check for updates on GitHub (manual check, ignores cooldown)
-  /// Returns a map with update info, or null when there is no update (or the
-  /// release is skipped). Throws when the check itself fails, so the caller
+  /// Returns a map with update info, or null when there is no update. Manual
+  /// checks include skipped releases. Throws when the check fails, so the caller
   /// can say so instead of reporting the latest version.
   static Future<Map<String, dynamic>?> checkForUpdates() {
     return _performUpdateCheck(respectCooldown: false, throwOnFailure: true);

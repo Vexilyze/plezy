@@ -15,12 +15,17 @@ import org.w3c.dom.Element
 class SystemShelfArtworkManifestTest {
   private companion object {
     const val ANDROID_NAMESPACE = "http://schemas.android.com/apk/res/android"
-    const val AUTHORITY = "com.edde746.plezy.systemshelf.artwork"
+    const val AUTHORITY = "\${applicationId}.systemshelf.artwork"
     val MANIFEST_CANDIDATES = listOf(
       "src/main/AndroidManifest.xml",
       "app/src/main/AndroidManifest.xml",
       "android/app/src/main/AndroidManifest.xml"
     )
+  }
+
+  @Test
+  fun artworkAuthorityBelongsToTheInstalledFork() {
+    assertEquals("com.vexilyze.tv.systemshelf.artwork", SystemShelfArtworkProvider.AUTHORITY)
   }
 
   @Test

@@ -63,6 +63,11 @@ class AppIconSwitcherTest {
   private fun state(component: ComponentName) = packageManager.getComponentEnabledSetting(component)
 
   @Test
+  fun forkKeepsItsOwnIcon() {
+    assertFalse(AppIconSwitcher(packageManager, "com.vexilyze.tv").isSupported())
+  }
+
+  @Test
   fun aFreshInstallShowsTheDefaultIconThroughTheExistingLauncherComponent() {
     val switcher = switcher()
 

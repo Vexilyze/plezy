@@ -1,3 +1,4 @@
+import 'utils/build_identity.dart';
 import 'dart:async';
 import 'dart:io' show Directory, Platform, ProcessInfo;
 import 'dart:ui' show AppExitResponse;
@@ -1970,7 +1971,7 @@ class _AppShell extends StatelessWidget {
                 behavior: HitTestBehavior.translucent,
                 child: InputModeTracker(
                   child: MaterialApp(
-                    title: t.app.title,
+                    title: appDisplayName,
                     debugShowCheckedModeBanner: false,
                     // The app language, not Flutter's en-US default: every
                     // Text inherits it as the locale that selects CJK glyph

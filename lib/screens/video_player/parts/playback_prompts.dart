@@ -373,10 +373,7 @@ extension _VideoPlayerPlaybackPromptMethods on VideoPlayerScreenState {
 
   void _onStillWatchingTimeout() {
     _unfocusStillWatchingPrompt();
-    final currentPlayer = player;
-    if (currentPlayer != null) {
-      _dispatchPlaybackIntent(_pauseWithPlaybackIntent(currentPlayer), source: 'Still watching');
-    }
+    SleepTimerService().completePrompt();
     _setPlayerState(() {
       _showStillWatchingPrompt = false;
     });
@@ -393,6 +390,7 @@ extension _VideoPlayerPlaybackPromptMethods on VideoPlayerScreenState {
 
   void _onStillWatchingPause() {
     _stillWatchingTimer?.cancel();
+    SleepTimerService().dismissPrompt();
     _unfocusStillWatchingPrompt();
     final currentPlayer = player;
     if (currentPlayer != null) {
@@ -426,5 +424,53 @@ extension _VideoPlayerPlaybackPromptMethods on VideoPlayerScreenState {
   void _unfocusStillWatchingPrompt() {
     _stillWatchingPauseFocusNode.unfocus();
     _stillWatchingContinueFocusNode.unfocus();
+  }
+
+  Future<void> _completeSleepTimer() {
+    final currentPlayer = player;
+    if (!mounted || _shuttingDown || currentPlayer == null) return Future<void>.value();
+    final generation = ++_sleepCompletionGeneration;
+    final timerRevision = SleepTimerService().revision;
+    final itemKey = _currentMetadata.globalKey;
+    _episode.autoPlayTimer?.cancel();
+    _episode.completionLatch.latch();
+    _setPlayerState(() => _episode.showPlayNextDialog = false);
+    bool isCurrent() =>
+        mounted &&
+        !_shuttingDown &&
+        player == currentPlayer &&
+        _currentMetadata.globalKey == itemKey &&
+        _sleepCompletionGeneration == generation &&
+        SleepTimerService().revision == timerRevision;
+
+    return completeSleepTimerPlayback(
+      isCurrent: isCurrent,
+      pause: () => _pauseWithPlaybackIntent(currentPlayer),
+      releaseWakelock: () => _wakelockController.setEnabled(false),
+      // At EOF this joins the same report _onVideoCompleted already started;
+      // for a duration timer it records the current stop/resume position.
+      finalizeProgress: () {
+        _sleepTimerStoppedProgress = true;
+        return _sendStoppedProgressOnce();
+      },
+      shouldSleep: () =>
+          TvSleepService.isAndroidTv && SettingsService.instance.read(SettingsService.sleepTimerSleepDevice),
+      sleep: () async {
+        final result = await const TvSleepService().sleep();
+        if (!mounted || result == TvSleepResult.requested) return;
+        showErrorSnackBar(
+          context,
+          result == TvSleepResult.permissionRequired ? t.tvSleep.permissionLost : t.tvSleep.sleepFailed,
+        );
+      },
+    ).catchError((Object error, StackTrace stackTrace) {
+      appLogger.w('Sleep timer could not finish playback', error: error, stackTrace: stackTrace);
+    });
+  }
+
+  void _resumeProgressAfterSleepTimer() {
+    if (!_sleepTimerStoppedProgress) return;
+    _sleepTimerStoppedProgress = false;
+    _progressTracker?.resumeAfterStoppedReport();
   }
 }

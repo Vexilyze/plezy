@@ -1,3 +1,13 @@
+# Vexilyze TV
+
+An independent Android/Android TV fork of [Plezy](https://github.com/edde746/plezy) with an accessibility-based TV sleep timer and in-app APK updates from this repository.
+
+**[Download the signed Android APK](https://github.com/Vexilyze/plezy/releases/latest/download/vexilyze-tv-android.apk)** · [Setup and release notes](docs/fork/RELEASE_NOTES.md) · [Building, signing and syncing upstream](docs/fork/RELEASING.md)
+
+The custom app lives on `vexilyze/android-tv`; `main` stays available as an upstream mirror. It installs as **Vexilyze TV** alongside Plezy. TV power control through a Google TV Streamer requires HDMI-CEC. The upstream project documentation and attribution follow.
+
+---
+
 <h1>
   <img src="assets/plezy.png" alt="Plezy Logo" height="24" style="vertical-align: middle;" />
   Plezy

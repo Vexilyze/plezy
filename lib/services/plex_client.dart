@@ -64,6 +64,7 @@ import '../models/transcode_quality_preset.dart';
 import '../utils/device_identity.dart';
 import '../utils/failover_http_client.dart';
 import '../utils/app_logger.dart';
+import '../utils/build_identity.dart';
 import '../utils/media_server_retry.dart';
 import '../utils/future_extensions.dart';
 import '../utils/media_server_timeouts.dart';
@@ -817,7 +818,7 @@ class PlexClient
       final headers = <String, String>{'X-Plex-Token': token};
       if (clientIdentifier != null) {
         headers['X-Plex-Client-Identifier'] = clientIdentifier;
-        headers['X-Plex-Product'] = 'Plezy';
+        headers['X-Plex-Product'] = appDisplayName;
         headers['X-Plex-Device-Name'] = sanitizeHeaderValue(identity.deviceName) ?? 'Plezy';
       }
 

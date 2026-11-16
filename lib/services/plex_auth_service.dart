@@ -1,3 +1,4 @@
+import '../utils/build_identity.dart';
 import 'dart:async';
 import 'dart:io' show InternetAddress, InternetAddressType, Platform;
 import 'package:flutter/foundation.dart';
@@ -51,7 +52,7 @@ String _redactHost(String host) {
 }
 
 class PlexAuthService {
-  static const String _appName = 'Plezy';
+  static const String _appName = appDisplayName;
   static const String _plexApiBase = 'https://plex.tv/api/v2';
   static const String _clientsApi = 'https://clients.plex.tv/api/v2';
 
