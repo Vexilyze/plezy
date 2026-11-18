@@ -43,51 +43,6 @@ def named_step(block: str, name: str) -> str:
     return match.group(0) if match else ""
 
 
-def validate_windows_signing(block: str) -> None:
-    install = named_step(block, "Install dependencies")
-    signing = named_step(block, "Sign installer for WinSparkle (EdDSA)")
-    require(
-        block.find("      - name: Install dependencies")
-        < block.find("      - name: Sign installer for WinSparkle (EdDSA)"),
-        "locked root dependencies must be installed before Windows signing",
-    )
-    require(
-        "flutter pub get --enforce-lockfile --no-example" in install,
-        "Windows signing must use the enforced root dependency lock",
-    )
-    require(
-        "dart run auto_updater:sign_update plezy-windows-installer.exe $keyPath"
-        in signing,
-        "Windows signing must execute the locked auto_updater package",
-    )
-    require(
-        "$env:RUNNER_TEMP" in signing,
-        "Windows signing key must live under RUNNER_TEMP",
-    )
-    require(
-        "try {" in signing and "} finally {" in signing,
-        "Windows signing key cleanup must run from a finally block",
-    )
-    require(
-        "Remove-Item -Path $keyPath -Force -ErrorAction SilentlyContinue"
-        in signing,
-        "Windows signing must remove its temporary key",
-    )
-    lowered = signing.lower()
-    for forbidden in (
-        "raw.githubusercontent.com",
-        "invoke-webrequest",
-        "git clone",
-        "_signer",
-        "pubspec.yaml",
-        "dart pub get",
-    ):
-        require(
-            forbidden not in lowered,
-            f"Windows signing step contains mutable or ad-hoc input: {forbidden}",
-        )
-
-
 def require_explicit_shells(name: str, block: str, shell: str) -> None:
     steps = re.findall(r"(?ms)^      - .*?(?=^      - |\Z)", block)
     run_steps = [step for step in steps if re.search(r"(?m)^        run:", step)]
@@ -261,7 +216,7 @@ require(
 
 
 package_windows = job("package-windows")
-validate_windows_signing(package_windows)
+require("SPARKLE_PRIVATE_KEY" not in package_windows, "Windows builds must use external release delivery")
 require("needs: build-windows" in package_windows, "Windows packaging must fan in the matrix")
 for artifact in (
     "windows-x64-build",

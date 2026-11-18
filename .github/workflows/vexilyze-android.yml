@@ -102,18 +102,15 @@ jobs:
         shell: bash
         run: python3 -m unittest discover -s scripts/fork -p 'test_*.py'
 
-      - name: Test fork playback and update behavior
+      - name: Test fork playback behavior
         shell: bash
         run: |
           flutter test \
-            test/services/android_update_test.dart \
-            test/widgets/android_update_dialog_test.dart \
             test/services/tv_sleep_service_test.dart \
             test/screens/settings/tv_sleep_settings_screen_test.dart \
             test/screens/video_player/sleep_timer_completion_test.dart \
             test/services/sleep_timer_service_test.dart \
             test/screens/video_player/still_watching_sleep_timer_test.dart \
-            test/services/update_service_test.dart \
             test/services/playback_source_resolver_test.dart \
             test/services/playback_initialization_offline_cache_test.dart
 
@@ -121,12 +118,11 @@ jobs:
         shell: bash
         run: bash scripts/fork/build_android.sh
 
-      - name: Test Android update identity and launcher deep links
+      - name: Test Android launcher and playback integrations
         working-directory: android
         shell: bash
         run: |
           ./gradlew :app:testDebugUnitTest -x :app:compileFlutterBuildDebug \
-            --tests com.edde746.plezy.updates.AndroidUpdatePluginTest \
             --tests com.edde746.plezy.deeplink.DeepLinkPluginTest \
             --tests com.edde746.plezy.watchnext.WatchNextProviderTest \
             --tests com.edde746.plezy.watchnext.SystemShelfArtworkManifestTest \
@@ -179,3 +175,30 @@ jobs:
             --notes-file RELEASE_NOTES.md \
             plezy-android-*.apk plezy-android-*.apk.sha256 \
             release-signing-certificate.sha256 SOURCE.txt LICENSE
+
+  publish-catalog:
+    needs: build
+    if: github.repository == 'Vexilyze/plezy' && (github.event_name == 'push' || inputs.publish)
+    runs-on: ubuntu-24.04
+    steps:
+      - name: Download verified APK and metadata
+        uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8
+        with:
+          name: plezy-android
+          path: release
+
+      - name: Publish signed Android releases to Vex Updates
+        shell: bash
+        env:
+          VEX_UPDATES_TOKEN: ${{ secrets.VEX_UPDATES_TOKEN }}
+        run: |
+          set -euo pipefail
+          : "${VEX_UPDATES_TOKEN:?Set the Plezy publisher secret}"
+          (cd release && sha256sum --check plezy-android-*.apk.sha256)
+          for apk in release/plezy-android-*.apk; do
+            curl --silent --show-error --fail-with-body --retry 3 --proto '=https' \
+              --header @<(printf 'Authorization: Bearer %s\n' "$VEX_UPDATES_TOKEN") \
+              --header 'Content-Type: application/vnd.android.package-archive' \
+              --request POST --upload-file "$apk" \
+              'https://updates.vexilar.io/api/v1/projects/plezy/releases?targets=phone,tv&name=Plezy'
+          done

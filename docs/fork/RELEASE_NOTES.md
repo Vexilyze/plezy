@@ -1,6 +1,10 @@
-# Plezy TV build 2.26.1+162
+# Plezy TV build 2.26.1+163
 
 An independently maintained Android and Android TV fork of [Plezy](https://github.com/edde746/plezy), based on upstream commit `02eeba69723b33f28e6b8ae9dab2ce1c02a1c3cd`.
+
+## Central updates
+
+This release removes the built-in update checks, update prompts and Android installer. Vex Updates now delivers Plezy on Android phones and televisions. It keeps the package name, app data and signing identity of preceding fork releases.
 
 ## Name and download size
 
@@ -28,9 +32,7 @@ The accessibility service requests only Android's screen-lock action. It does no
 
 ## Updates
 
-The app checks this fork's published GitHub releases at startup, with a six-hour check interval, and notifies you when a compatible Android update is available. You can also check manually in Settings. Download and install from the update dialog; Android asks you to allow installation from this app the first time and confirm each update.
-
-Updates are checked for package identity, signing key, build number, compatible processor, download size and the GitHub SHA-256 digest when available. Future releases use the same signing key and preserve this app's data.
+The Vex Updates catalog delivers signed Plezy APKs for Android phones and TVs at https://updates.vexilar.io. Use the usual platform release downloads or store for desktop builds. This fork has removed its built-in update checks and installer.
 
 ## First installation
 

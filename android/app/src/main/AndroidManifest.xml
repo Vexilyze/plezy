@@ -2,7 +2,6 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:installLocation="internalOnly">
     <uses-permission android:name="android.permission.INTERNET"/>
-    <uses-permission android:name="android.permission.REQUEST_INSTALL_PACKAGES"/>
     <uses-permission android:name="android.permission.MODIFY_AUDIO_SETTINGS"/>
 
 
@@ -545,14 +544,6 @@
             <meta-data android:name="android.accessibilityservice"
                 android:resource="@xml/tv_sleep_accessibility_service" />
         </service>
-        <provider
-            android:name="com.edde746.plezy.updates.UpdateFileProvider"
-            android:authorities="${applicationId}.updates"
-            android:exported="false"
-            android:grantUriPermissions="true">
-            <meta-data android:name="android.support.FILE_PROVIDER_PATHS"
-                android:resource="@xml/update_paths" />
-        </provider>
         <provider
             android:name="androidx.core.content.FileProvider"
             android:authorities="${applicationId}.fileprovider"

@@ -84,7 +84,7 @@ git push origin 'v2.26.1+162'
 ```
 
 The **Plezy Android release** workflow runs only in `Vexilyze/plezy`. It analyzes the
-project, runs focused playback/update tests, builds and verifies the three signed architecture-specific APKs, and
+project, runs focused playback tests, builds and verifies the three signed architecture-specific APKs, and
 publishes a GitHub Release. Upstream's desktop build workflow is not triggered. A missing secret,
 mismatched signer or existing release causes failure instead of publishing another kind of APK.
 
@@ -93,9 +93,7 @@ without publishing. GitHub only exposes manual dispatch after the workflow exist
 repository's default branch. For a manual publication, the version tag must already point at
 the exact selected commit. The tag-triggered path works for the first release.
 
-The in-app Android updater reads the fork's releases and requests Android's installation UI.
-The user approves installation. APK SHA-256 checks and Android package/signature/version checks
-protect the update handoff; no update should replace the app's permanent signing identity.
+Set the repository Actions secret `VEX_UPDATES_TOKEN` to a publishing token scoped to `plezy`. Successful tagged releases publish each signed APK to the phone and TV catalog at https://updates.vexilar.io. Desktop packages are distributed through their usual release download or platform store.
 
 ## Keep the fork current
 
@@ -111,7 +109,7 @@ git switch vexilyze/android-tv
 git merge main
 ```
 
-Resolve conflicts, check the release signing rules, versionCode, updater repository and fork
+Resolve conflicts, check the release signing rules, versionCode, catalog publication and fork
 branding, run the relevant tests, then push the custom branch. Do not force-reset the custom
 branch to upstream: that would discard the fork features. Existing users receive the change
 only after a new signed APK is released and installed.
@@ -119,7 +117,7 @@ only after a new signed APK is released and installed.
 ## Distribution identity
 
 Retain the upstream `LICENSE` and attribution. The owner requested the original Plezy display
-name and icon for personal TV installations; the fork package ID, update repository, signing key
+name and icon for personal TV installations; the fork package ID, publishing project, signing key
 and URL scheme remain independent. This is not an official Plezy build. Consult `TRADEMARKS.md`
 for the upstream project's naming and redistribution terms before distribution beyond personal use.
 

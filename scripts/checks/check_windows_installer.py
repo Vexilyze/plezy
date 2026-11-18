@@ -63,7 +63,7 @@ require(
 )
 require(
     "OutputBaseFilename=plezy-windows-installer" in iss,
-    "the release asset name is referenced by the appcast, winget and the website",
+    "the release asset name is referenced by winget and the website",
 )
 require(
     "ArchitecturesAllowed=$ArchAllowed" in iss
@@ -125,7 +125,7 @@ require(
 # Preserve behavior required by release tooling.
 require(
     "{param:WINGET|0}" in iss and "{app}\\.winget" in iss,
-    "the winget marker file gates UpdateService.useNativeUpdater",
+    "preserve the installed winget package marker",
 )
 require(
     "{param:NORUN|0}" in iss and "Check: not IsNoRun" in iss,

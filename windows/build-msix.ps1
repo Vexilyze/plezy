@@ -2,7 +2,7 @@
 # Windows Store (MSIX) Build Script
 # Packs the per-arch Flutter Release output into one dual-architecture
 # .msixbundle for Microsoft Store submission. Purely additive: the Inno Setup
-# installer, the portable archives and the WinSparkle appcast are untouched.
+# installer, and portable archives are untouched.
 #
 # Nothing here signs the bundle. The Store re-signs after certification, and a
 # package signed with any other certificate fails publisher-identity validation.

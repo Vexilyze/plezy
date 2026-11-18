@@ -53,7 +53,7 @@ class BuildWorkflowGuardTest(unittest.TestCase):
     def _cmake(self) -> str:
         return WINDOWS_CMAKE.read_text(encoding="utf-8")
 
-    def test_locked_root_signer_passes(self) -> None:
+    def test_release_workflow_passes(self) -> None:
         result = self._run(self._workflow())
 
         self.assertEqual(result.returncode, 0, result.stderr)
@@ -71,68 +71,6 @@ class BuildWorkflowGuardTest(unittest.TestCase):
 
         self.assertNotEqual(result.returncode, 0)
         self.assertIn("refs/tags/${version}", result.stderr)
-
-    def test_mutable_download_in_signing_step_is_rejected(self) -> None:
-        workflow = self._workflow().replace(
-            "          try {\n",
-            "          Invoke-WebRequest -Uri https://raw.githubusercontent.com/example/main/sign.dart -OutFile sign.dart\n"
-            "          try {\n",
-            1,
-        )
-
-        result = self._run(workflow)
-
-        self.assertNotEqual(result.returncode, 0)
-        self.assertIn("mutable or ad-hoc input: raw.githubusercontent.com", result.stderr)
-        self.assertIn("mutable or ad-hoc input: invoke-webrequest", result.stderr)
-
-    def test_inline_dependency_resolution_in_signing_step_is_rejected(self) -> None:
-        workflow = self._workflow().replace(
-            "          try {\n",
-            "          Set-Content -Path pubspec.yaml -Value 'dependencies: {}'\n"
-            "          dart pub get\n"
-            "          try {\n",
-            1,
-        )
-
-        result = self._run(workflow)
-
-        self.assertNotEqual(result.returncode, 0)
-        self.assertIn("mutable or ad-hoc input: pubspec.yaml", result.stderr)
-        self.assertIn("mutable or ad-hoc input: dart pub get", result.stderr)
-
-    def test_downloaded_signer_execution_is_rejected(self) -> None:
-        workflow = self._workflow().replace(
-            "dart run auto_updater:sign_update plezy-windows-installer.exe $keyPath",
-            "dart run sign.dart plezy-windows-installer.exe $keyPath",
-            1,
-        )
-
-        result = self._run(workflow)
-
-        self.assertNotEqual(result.returncode, 0)
-        self.assertIn("must execute the locked auto_updater package", result.stderr)
-
-    def test_unlocked_install_is_rejected(self) -> None:
-        prefix, package_and_after = self._workflow().split("  package-windows:\n", 1)
-        workflow = prefix + "  package-windows:\n" + package_and_after.replace(
-            "flutter pub get --enforce-lockfile --no-example",
-            "flutter pub get",
-            1,
-        )
-
-        result = self._run(workflow)
-
-        self.assertNotEqual(result.returncode, 0)
-        self.assertIn("enforced root dependency lock", result.stderr)
-
-    def test_missing_finally_cleanup_is_rejected(self) -> None:
-        workflow = self._workflow().replace("          } finally {\n", "          }\n", 1)
-
-        result = self._run(workflow)
-
-        self.assertNotEqual(result.returncode, 0)
-        self.assertIn("cleanup must run from a finally block", result.stderr)
 
     def test_libmpv_cache_without_lock_identity_is_rejected(self) -> None:
         workflow = self._workflow().replace(

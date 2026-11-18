@@ -36,13 +36,11 @@ import 'package:plezy/services/settings_service.dart';
 import 'package:plezy/services/storage_service.dart';
 import 'package:plezy/services/supporter/supporter_mode.dart';
 import 'package:plezy/services/supporter/supporter_service.dart';
-import 'package:plezy/services/update_service.dart';
 import 'package:plezy/theme/mono_theme.dart';
 import 'package:plezy/utils/platform_detector.dart';
 import 'package:plezy/widgets/app_icon.dart';
 import 'package:plezy/widgets/dialog_action_button.dart';
 import 'package:plezy/widgets/focusable_list_tile.dart';
-import 'package:plezy/widgets/loading_indicator_box.dart';
 import 'package:plezy/widgets/setting_tile.dart';
 import 'package:provider/provider.dart';
 
@@ -136,12 +134,6 @@ void main() {
       const _MigratedRow(title: 'Test ANR', isVisible: kDebugMode),
       _MigratedRow(title: t.settings.exportSettings, focusLabel: 'settings_export_settings'),
       _MigratedRow(title: t.settings.importSettings, focusLabel: 'settings_import_settings'),
-      _MigratedRow(
-        title: t.settings.checkForUpdates,
-        focusLabel: 'settings_check_for_updates',
-        isVisible: UpdateService.isUpdateCheckAvailable && UpdateService.useNativeUpdater,
-        hasSubtitle: false,
-      ),
     ];
 
     final referenceHeight = tester.getSize(_focusableTileFor(t.settings.viewLogs)).height;
@@ -180,11 +172,7 @@ void main() {
         expect(focusable.focusNode, isNull, reason: '${row.title} intentionally uses the tile-owned focus node');
       }
 
-      if (row.hasSubtitle) {
-        // Subtitle rows occupy the same vertical space as an existing standard
-        // SettingNavigationTile in this screen.
-        expect(tester.getSize(focusableFinder).height, referenceHeight);
-      }
+      expect(tester.getSize(focusableFinder).height, referenceHeight);
     }
 
     // Exercise both input paths against real callbacks rather than merely
@@ -240,36 +228,6 @@ void main() {
       Navigator.of(tester.element(find.byType(AlertDialog))).pop();
       await _pumpUi(tester);
     }
-
-    if (!UpdateService.isUpdateCheckAvailable) {
-      expect(find.text(t.settings.checkForUpdates), findsNothing);
-      return;
-    }
-
-    if (UpdateService.useNativeUpdater) {
-      expect(_navigationTileFor(t.settings.checkForUpdates), findsOneWidget);
-      return;
-    }
-
-    final updateTileFinder = _focusableTileFor(t.settings.checkForUpdates);
-    final materialUpdateTile = tester.widget<ListTile>(
-      find.descendant(of: updateTileFinder, matching: find.byType(ListTile)),
-    );
-    final updateTile = tester.widget<FocusableListTile>(updateTileFinder);
-
-    expect(_navigationTileFor(t.settings.checkForUpdates), findsNothing);
-    expect(updateTile.dense, isTrue);
-    expect(materialUpdateTile.dense, isTrue);
-    expect(materialUpdateTile.visualDensity, const VisualDensity(vertical: -3));
-    expect(updateTile.visualDensity, const VisualDensity(vertical: -3));
-    expect(updateTile.trailing, isA<AppIcon>());
-    expect(updateTile.onTap, isNotNull);
-    expect(find.descendant(of: updateTileFinder, matching: find.byType(LoadingIndicatorBox)), findsNothing);
-
-    // The generic updater deliberately remains a FocusableListTile: unlike a
-    // SettingNavigationTile, its trailing slot can be replaced by the progress
-    // indicator and its callback disabled while a request is in flight.
-    expect(materialUpdateTile.focusNode, isNotNull);
   });
 
   testWidgets('background downloads tile renders and opens the injected blocked status', (tester) async {
@@ -610,12 +568,11 @@ Finder _focusableTileWithin(Finder navigationTile) =>
     find.descendant(of: navigationTile, matching: find.byType(FocusableListTile));
 
 class _MigratedRow {
-  const _MigratedRow({required this.title, this.focusLabel, this.isVisible = true, this.hasSubtitle = true});
+  const _MigratedRow({required this.title, this.focusLabel, this.isVisible = true});
 
   final String title;
   final String? focusLabel;
   final bool isVisible;
-  final bool hasSubtitle;
 }
 
 class _SettingsHarness {
