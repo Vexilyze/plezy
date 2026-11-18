@@ -49,7 +49,7 @@ Set `ANDROID_HOME` and put the pinned Flutter SDK on `PATH`, then run:
 bash scripts/fork/build_android.sh
 ```
 
-The script checks for updates from `Vexilyze/plezy` and produces three standalone APKs in
+The script produces three standalone APKs in
 `build/fork-release/`: `plezy-android-arm64-v8a.apk`, `plezy-android-armeabi-v7a.apk`, and
 `plezy-android-x86_64.apk`, each with its own SHA-256 file. The output also contains the public
 signing certificate fingerprint, source attribution, license and release notes. Packaging verifies
@@ -59,7 +59,7 @@ cannot fall back to debug signing.
 
 Flutter normally adds an architecture offset to split APK version codes. This project sets
 `force-version-code-ignoring-abi=true` so every APK uses the exact numeric build from
-`pubspec.yaml`. Preserve this setting: the updater and Android's installer both rely on monotonic
+`pubspec.yaml`. Preserve this setting: Vex Updates and Android’s installer both rely on monotonic
 version codes, including upgrades from the universal build 161.
 
 `android.packaging.jniLibs.useLegacyPackaging=true` compresses native libraries in each APK.

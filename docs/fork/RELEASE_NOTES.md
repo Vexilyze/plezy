@@ -16,7 +16,7 @@ The former 276 MB universal APK is replaced by three standalone APKs, each conta
 - `plezy-android-armeabi-v7a.apk`: 32-bit ARM devices.
 - `plezy-android-x86_64.apk`: x86_64 devices/emulators.
 
-For the Google TV Streamer 4K, start with the ARMv7 (32-bit) APK: its Android userspace has been reported as 32-bit despite the 64-bit CPU ([device installation report](https://github.com/yuliskov/SmartTube/issues/4620)). The updater reads Android’s supported ABIs and chooses the matching APK automatically. All three use versionCode **162** and the same signing key as build 161, so existing fork installations update normally and retain their data.
+For the Google TV Streamer 4K, start with the ARMv7 (32-bit) APK: its Android userspace has been reported as 32-bit despite the 64-bit CPU ([device installation report](https://github.com/yuliskov/SmartTube/issues/4620)). Vex Updates reads Android’s supported ABIs and chooses the matching APK automatically. All three use versionCode **163** and the same signing key as builds 161 and 162, so existing fork installations update normally and retain their data.
 
 ## TV sleep timer
 
