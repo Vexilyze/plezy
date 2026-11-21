@@ -106,6 +106,8 @@ jobs:
         shell: bash
         run: |
           flutter test \
+            test/android/network_security_config_test.dart \
+            test/utils/certificate_trust_test.dart \
             test/services/tv_sleep_service_test.dart \
             test/screens/settings/tv_sleep_settings_screen_test.dart \
             test/screens/video_player/sleep_timer_completion_test.dart \

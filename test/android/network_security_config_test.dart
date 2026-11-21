@@ -13,7 +13,6 @@ const _expectedDomains = <String>{
   'anilist.co',
   'simkl.com',
   'simkl.in',
-  'jsdelivr.net',
   'github.com',
   'githubusercontent.com',
   'image.tmdb.org',

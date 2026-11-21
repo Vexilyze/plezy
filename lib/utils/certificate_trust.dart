@@ -40,7 +40,6 @@ abstract final class CertificateTrust {
     'anilist.co',
     'simkl.com',
     'simkl.in',
-    'jsdelivr.net',
     'github.com',
     // Redirect target of github.com release asset downloads, never written in source.
     'githubusercontent.com',
