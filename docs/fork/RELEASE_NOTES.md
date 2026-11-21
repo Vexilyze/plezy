@@ -1,10 +1,24 @@
-# Plezy TV build 2.26.1+163
+# Plezy TV build 2.26.1+164
 
-An independently maintained Android and Android TV fork of [Plezy](https://github.com/edde746/plezy), based on upstream commit `02eeba69723b33f28e6b8ae9dab2ce1c02a1c3cd`.
+An independently maintained Android and Android TV fork of [Plezy](https://github.com/edde746/plezy), synced with upstream `main` through commit `8310991fa`.
+
+## Upstream updates
+
+This release includes all ten upstream commits since the previous fork base:
+
+- Reach the profile menu with the TV remote when the Home screen is empty.
+- Restore the configured profile prompt after resuming a TV that hosts the companion remote server.
+- Keep download sync rules from restarting downloads after a storage-related stop.
+- Respect Plex's current media-deletion setting before offering or performing a deletion.
+- Improve library controls and long library names on narrow phone screens.
+- Add European Portuguese and improve locale selection.
+- Include upstream iOS and macOS storage and external-display fixes in the synced source.
+
+The Plezy name and icon, TV sleep timer, compressed APKs for each processor, package ID and signing key remain unchanged. Install this as an update to keep existing settings and downloads.
 
 ## Central updates
 
-This release removes the built-in update checks, update prompts and Android installer. Vex Updates now delivers Plezy on Android phones and televisions. It keeps the package name, app data and signing identity of preceding fork releases.
+Vex Updates delivers Plezy on Android phones and televisions. The fork's built-in update checks, update prompts and Android installer remain removed.
 
 ## Name and download size
 
@@ -16,7 +30,7 @@ The former 276 MB universal APK is replaced by three standalone APKs, each conta
 - `plezy-android-armeabi-v7a.apk`: 32-bit ARM devices.
 - `plezy-android-x86_64.apk`: x86_64 devices/emulators.
 
-For the Google TV Streamer 4K, start with the ARMv7 (32-bit) APK: its Android userspace has been reported as 32-bit despite the 64-bit CPU ([device installation report](https://github.com/yuliskov/SmartTube/issues/4620)). Vex Updates reads Android’s supported ABIs and chooses the matching APK automatically. All three use versionCode **163** and the same signing key as builds 161 and 162, so existing fork installations update normally and retain their data.
+For the Google TV Streamer 4K, use the ARMv7 (32-bit) APK; this architecture was confirmed on the owner's device. Vex Updates reads Android’s supported ABIs and chooses the matching APK automatically. All three use versionCode **164** and the same signing key as earlier fork builds, so existing fork installations update normally and retain their data.
 
 ## TV sleep timer
 
@@ -28,7 +42,16 @@ On your Google TV Streamer 4K:
 2. Turn on **Sleep this device when the timer finishes** and use **Open accessibility settings** to enable **Plezy sleep timer**.
 3. Enable HDMI-CEC power control on both your Streamer and television so the television follows the Streamer into standby.
 
-The accessibility service requests only Android's screen-lock action. It does not read screen content or monitor input. If Android blocks the sideloaded service, allow restricted settings for Plezy in Android's app settings first. Android TV 9 or later is required for device sleep. Physical TV standby depends on HDMI-CEC and has not been verified on your television.
+The accessibility service requests only Android's screen-lock action. It does not read screen content or monitor input. Android TV 9 or later is required for device sleep. Physical TV standby depends on HDMI-CEC and has not been verified on your television.
+
+If the Accessibility switch immediately turns off, Android may have blocked restricted settings for the APK. This can recur after installation. Allow restricted settings for Plezy in Android's app settings if that option exists. On the Google TV Streamer, after connecting ADB to that device, the verified recovery is:
+
+```sh
+adb shell appops set com.vexilyze.tv ACCESS_RESTRICTED_SETTINGS allow
+adb shell appops write-settings
+```
+
+Then enable **Plezy sleep timer** in Accessibility again. This is a device permission; reinstalling the APK does not fix it.
 
 ## Updates
 

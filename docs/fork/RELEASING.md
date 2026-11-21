@@ -79,8 +79,8 @@ not promised. Keep the published APK and its checksum as the exact release artif
 4. Tag that exact commit with `v` followed by the complete pubspec version, including `+build`:
 
 ```bash
-git tag -a 'v2.26.1+162' -m 'Plezy TV build 2.26.1+162'
-git push origin 'v2.26.1+162'
+git tag -a 'v2.26.1+164' -m 'Plezy TV build 2.26.1+164'
+git push origin 'v2.26.1+164'
 ```
 
 The **Plezy Android release** workflow runs only in `Vexilyze/plezy`. It analyzes the
